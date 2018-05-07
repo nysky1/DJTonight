@@ -1,0 +1,19 @@
+{
+  "name": "nodetest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "2.3.2",
+    "debug": "3.1.0",
+    "ejs": "2.5.8",
+    "express": "4.16.3",
+    "morgan": "1.9.0",
+    "path": "0.12.7"
+  }
+}
