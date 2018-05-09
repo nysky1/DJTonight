@@ -1,37 +1,60 @@
 'use strict';
 const isDebug = true;
-const BIT_API_KEY = 'AIzaSyA0sGD6XCJl2wcEWMgYHGR8g2UgG-MGN4o';
-const BIT_API_URL = 'https://api.bandsintown.com/events/search' //?location=Denver,Co&api_version=2.0&limit=10'
+const SONGKICK_API_KEY = 'jwzmbEyCAIwD7HCy';
+const SONGKICK_API_LOCATION_URL = 'http://api.songkick.com/api/3.0/search/locations.json'; //http://api.songkick.com/api/3.0/search/locations.json?query=Denver,CO&apikey=ABC
+const SONGKICK_API_CALENDAR_URL = 'http://api.songkick.com/api/3.0/metro_areas/~METRO_ID~/calendar.json'; //http://api.songkick.com/api/3.0/metro_areas/6404/calendar.json?apikey=ABC
 
 const SPOTIFY_API_URL = 'https://api.spotify.com/v1/search'
 
 const eventsForMap = [];
-const deferredCalls = [];
+let metroId = ''
 
-function eventMaker(name, eventDate, isEDM) {
+function prepareSongKickAPIURL(metroId) {
+  return SONGKICK_API_CALENDAR_URL.replace('~METRO_ID~', metroId);
+}
+
+function eventMaker(name, eventDate, city, lat, lng, popularity) {
   let thisEvent = {
     name: name,
     eventDate: eventDate,
-    isEDM: isEDM
+    city: city,
+    lat: lat,
+    lng: lng,
+    popularity: popularity
   }
   return thisEvent;
 }
 
-function getDataBandsInTown() {
-  dWrite('Calling BIT API');
+function getSongKickLocation() {
+  dWrite('Calling SongKick API Location');
 
   let location = $('#city').val() + "," + $("#state").val();
 
   let request = {
-    location: `${location}`,
-    api_version: '2.0',
-    limit: 5,
-    app_id: 'supp'
+    query: `${location}`,
+    apikey: SONGKICK_API_KEY
   };
   return $.ajax({
-    url: BIT_API_URL,
+    url: SONGKICK_API_LOCATION_URL,
     data: request,
-    dataType: 'jsonp',
+    dataType: 'json',
+    type: 'GET'
+  });
+}
+function getSongKickEvents() {
+  dWrite(`Calling SongKick API Events for metroId: ${metroId}`);
+  let myDate = new Date();
+  let currDate = formatISODate(myDate);
+
+  let request = {
+    apikey: SONGKICK_API_KEY,
+    min_date: currDate,
+    max_date: currDate
+  };
+  return $.ajax({
+    url: prepareSongKickAPIURL(metroId),
+    data: request,
+    dataType: 'json',
     type: 'GET'
   });
 }
@@ -54,28 +77,43 @@ function getGenreFromSpotify(aristName) {
     error: function (xhr, textStatus, errorThrown) { alert(errorThrown); }
   })
 }
-
 function checkGenres(results, thisEvent) {
   dWrite(results.artists.items[0]);
   thisEvent.isEDM = true;
   eventsForMap.push(thisEvent);
 }
-
 function showResults(events) {
   let resultsHTML = '';
   let isEDM = false;
-  for (let i = 0; i < events.length; i++) {
-    let artist = events[i].artists[0].name;
-    let thisEvent = eventMaker(artist, events[i].datetime);
-      //getGenreFromSpotify(artist)
-      //  .done(function (results) {
-      //    return checkGenres(results, thisEvent)
-      //  });
-      resultsHTML += `<p>${thisEvent.name}</p>`;
-  };
+  events.resultsPage.results.event.forEach( item => {
+    eventsForMap.push(
+      new eventMaker(item.displayName, item.start.datetime, item.location.city, item.location.lat, item.location.lng, item.popularity)
+      );
+  });
 
-  resultsHTML += 'Done';
+  for (let i = 0; i < eventsForMap.length; i++) {
+    resultsHTML += `<p>${eventsForMap[i].name} - Populatiry: ${eventsForMap[i].popularity}</p>`;
+  }
+
+  // for (let i = 0; i < events.resultsPage.results.length; i++) {
+  //   let artist = events.resultsPage.results[i].re[0].name;
+  //   let follower = events[i].artists[0].name;
+  //   let thisEvent = eventMaker(artist, events[i].datetime);
+  //   // getGenreFromSpotify(artist)
+  //   //     .done(function (results) {
+  //   //       return checkGenres(results, thisEvent)
+  //   //     });
+  //     resultsHTML += `<p>${thisEvent.name} - Followers: %{this}</p>`;
+  // };
+  let sArray = sortArray();
+  
+  $('.js-results').html(resultsHTML); 
   return resultsHTML;
+}
+function sortArray() {
+  return eventsForMap.sort( (a,b) => {
+    return a.popularity - b.popularity
+  } )
 }
 function toggleState(stateIndex) {
   switch (stateIndex) {
@@ -90,19 +128,47 @@ function toggleState(stateIndex) {
       break;
   }
 }
+function validateLocationSetAndContinue(results, cb) {
+  var defer = $.Deferred();
+  if (results.resultsPage.totalEntries === 0) {
+    return defer.reject();
+  }
+  metroId = results.resultsPage.results.location["0"].metroArea.id;
+  return defer.resolve();
+}
 
 function watchSearch() {
   $('.btnSubmit').click((event) => {
     event.preventDefault();
-
+    eventsForMap.length = 0;
     //call API with promise
-    getDataBandsInTown()
-    .done(function (results) {
-      $('.js-results').html(showResults(results));
-    })
-    .fail(function () {
-      alert("Oops, the search failed!");
-    });
+    $.when(
+      getSongKickLocation()
+    )
+      .done(function (results) {
+        $.when(
+          validateLocationSetAndContinue(results)
+        )
+          .done(function (results) {
+            $.when(
+              getSongKickEvents(results)
+            )
+            .then(function (results) {
+              showResults(results)
+              dWrite('finished fetching')
+            })
+            dWrite('Location is ok, continuing.');
+          })
+          .fail(function () {
+            alert(`Oops, we can't find that location.  Have another look at your location entry!`);
+            dWrite('No Geo Results from Location API');
+          })
+      })
+      .fail(function (result) {
+        alert(`Oops, the location search failed.  Check the API Key and URL - ${result.statusText} (${result.status})!`);
+        dWrite(result.statusText);
+      });
+
 
   });
 }
@@ -113,6 +179,18 @@ function loadEventWatchers() {
 function loadApp() {
   loadEventWatchers();
 }
+
+/* */
+function formatISODate(dt) {
+  function pad(number) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    return number;
+  }
+  return dt.getUTCFullYear() + '-' + pad(dt.getUTCMonth() + 1) + '-' + pad(dt.getUTCDate());
+}
+/* */
 
 /* END VALIDATION */
 function dWrite(item) {
