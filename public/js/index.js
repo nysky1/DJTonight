@@ -1,13 +1,25 @@
 'use strict';
 const isDebug = true;
-const SONGKICK_API_KEY = 'jwzmbEyCAIwD7HCy';
+const SONGKICK_API_KEY = 'YNtS7YGARCxD6b3X';
 const SONGKICK_API_LOCATION_URL = 'http://api.songkick.com/api/3.0/search/locations.json'; //http://api.songkick.com/api/3.0/search/locations.json?query=Denver,CO&apikey=ABC
 const SONGKICK_API_CALENDAR_URL = 'http://api.songkick.com/api/3.0/metro_areas/~METRO_ID~/calendar.json'; //http://api.songkick.com/api/3.0/metro_areas/6404/calendar.json?apikey=ABC
 
 const SPOTIFY_API_URL = 'https://api.spotify.com/v1/search'
 
+const MAPS_API_KEY = 'AIzaSyCJa2H-XH59JxiczNe0t6G6yZcRIqBMpN8'
+
 const eventsForMap = [];
-let metroId = ''
+
+let map;
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: 36.0237614, lng: -107.7637304 },
+    zoom: 10
+  });
+
+}
+
 
 function prepareSongKickAPIURL(metroId) {
   return SONGKICK_API_CALENDAR_URL.replace('~METRO_ID~', metroId);
@@ -20,7 +32,8 @@ function eventMaker(name, eventDate, city, lat, lng, popularity) {
     city: city,
     lat: lat,
     lng: lng,
-    popularity: popularity
+    popularity: popularity,
+    mostPopular: false
   }
   return thisEvent;
 }
@@ -41,7 +54,7 @@ function getSongKickLocation() {
     type: 'GET'
   });
 }
-function getSongKickEvents() {
+function getSongKickEvents(metroId) {
   dWrite(`Calling SongKick API Events for metroId: ${metroId}`);
   let myDate = new Date();
   let currDate = formatISODate(myDate);
@@ -82,38 +95,100 @@ function checkGenres(results, thisEvent) {
   thisEvent.isEDM = true;
   eventsForMap.push(thisEvent);
 }
+function updateEventWithMostPopular(mostPopEvent) {
+
+  let bigEvent = eventsForMap.find((item) => {
+    return item.name === mostPopEvent.name
+  })
+  bigEvent.mostPopular = true;
+}
 function showResults(events) {
   let resultsHTML = '';
   let isEDM = false;
-  events.resultsPage.results.event.forEach( item => {
+  events.resultsPage.results.event.forEach(item => {
     eventsForMap.push(
       new eventMaker(item.displayName, item.start.datetime, item.location.city, item.location.lat, item.location.lng, item.popularity)
-      );
+    );
   });
 
   for (let i = 0; i < eventsForMap.length; i++) {
-    resultsHTML += `<p>${eventsForMap[i].name} - Populatiry: ${eventsForMap[i].popularity}</p>`;
+    resultsHTML += `<p>${eventsForMap[i].name} - Popularity: ${eventsForMap[i].popularity}</p>`;
   }
 
-  // for (let i = 0; i < events.resultsPage.results.length; i++) {
-  //   let artist = events.resultsPage.results[i].re[0].name;
-  //   let follower = events[i].artists[0].name;
-  //   let thisEvent = eventMaker(artist, events[i].datetime);
-  //   // getGenreFromSpotify(artist)
-  //   //     .done(function (results) {
-  //   //       return checkGenres(results, thisEvent)
-  //   //     });
-  //     resultsHTML += `<p>${thisEvent.name} - Followers: %{this}</p>`;
-  // };
-  let sArray = sortArray();
-  
-  $('.js-results').html(resultsHTML); 
-  return resultsHTML;
+  let sArray = sortArrayByPopularity();
+  updateEventWithMostPopular(sArray[0]);
+
+  $('.js-results').html(resultsHTML);
+  $('#frmEventMap').prop('hidden', false);
+  $('#frmSearch').prop('hidden', true);
+  $('.searchToggle').prop('hidden', true);
+  $('#map').addClass('display');
+  $('body').addClass('noBox');
+  setMarkers();
 }
-function sortArray() {
-  return eventsForMap.sort( (a,b) => {
-    return a.popularity - b.popularity
-  } )
+
+function setMarkers() {
+  // Adds markers to the map.
+  let bounds = new google.maps.LatLngBounds();
+  // Marker sizes are expressed as a Size of X,Y where the origin of the image
+  // (0,0) is located in the top left of the image.
+
+  // Origins, anchor positions and coordinates of the marker increase in the X
+  // direction to the right and in the Y direction down.
+
+  let pinColorBigEvent = "07CA07";
+  let pinImageBigEvent = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColorBigEvent,
+    new google.maps.Size(21, 34),
+    new google.maps.Point(0, 0),
+    new google.maps.Point(10, 34));
+  let pinColor = "FE7569";
+  let pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+    new google.maps.Size(21, 34),
+    new google.maps.Point(0, 0),
+    new google.maps.Point(10, 34));
+
+  // Shapes define the clickable region of the icon. The type defines an HTML
+  // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+  // The final coordinate closes the poly by connecting to the first coordinate.
+  var shape = {
+    coords: [1, 1, 1, 20, 18, 20, 18, 1],
+    type: 'poly'
+  };
+  for (var i = 0; i < eventsForMap.length; i++) {
+    let beach = eventsForMap[i];
+    let marker = new google.maps.Marker({
+      position: { lat: eventsForMap[i].lat, lng: eventsForMap[i].lng },
+      map: map,
+      icon: (eventsForMap[i].mostPopular) ? pinImageBigEvent : pinImage,
+      shape: shape,
+      title: eventsForMap[i].name,
+      zIndex: 9999
+    });
+    let infowindow = new google.maps.InfoWindow({
+      content: eventsForMap[i].name
+    }); 
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+
+    bounds.extend(marker.position);
+  }
+
+  var infowindow = new google.maps.InfoWindow();
+  map.fitBounds(bounds);
+
+  var listener = google.maps.event.addListener(map, "idle", function () {
+    map.setZoom(9);
+    google.maps.event.removeListener(listener);
+  });
+}
+
+
+
+function sortArrayByPopularity() {
+  return eventsForMap.sort((a, b) => {
+    return b.popularity - a.popularity
+  })
 }
 function toggleState(stateIndex) {
   switch (stateIndex) {
@@ -128,13 +203,14 @@ function toggleState(stateIndex) {
       break;
   }
 }
-function validateLocationSetAndContinue(results, cb) {
+function validateLocationSetAndContinue(results) {
+  let metroId;
   var defer = $.Deferred();
   if (results.resultsPage.totalEntries === 0) {
     return defer.reject();
   }
   metroId = results.resultsPage.results.location["0"].metroArea.id;
-  return defer.resolve();
+  return defer.resolve(metroId);
 }
 
 function watchSearch() {
@@ -149,14 +225,14 @@ function watchSearch() {
         $.when(
           validateLocationSetAndContinue(results)
         )
-          .done(function (results) {
+          .done(function (metroId) {
             $.when(
-              getSongKickEvents(results)
+              getSongKickEvents(metroId)
             )
-            .then(function (results) {
-              showResults(results)
-              dWrite('finished fetching')
-            })
+              .then(function (results) {
+                showResults(results)
+                dWrite('finished fetching')
+              })
             dWrite('Location is ok, continuing.');
           })
           .fail(function () {

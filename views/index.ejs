@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,29 +10,40 @@
   <link type="text/css" href="../css/main.css" rel='stylesheet' />
   <title>DJ Tonight</title>
 </head>
-<body>
-  <h1>DJ Tonight</h1>
-  <h2 class="lblSpotifyStatus" hidden>You are now logged in to Spotify</h2>
-  <h2>Looking for a DJ/Electronic show this evening in your town?</h2>
-  <h5 class="lblSpotifyRequired">A Spotify account is required to search so please be ready to authenticate</h3>
 
-  <form id="frmSpotify">
-    <button class="btnLoginSpotify">Log in with Spotify</button>
-  </form>
-  <form id="frmSearch" hidden>
-    <fieldset>
-      <legend>Enter your Location:</legend>
-      <label for="city"></label>
-      <input id="city" value="Denver" />
-      <label for="state"></label>
-      <input id="state" value="CO" />
-      <button class="btnSubmit">Search</button>
-    </fieldset>
-    <div class="js-results" aria-live="assertive"></div> 
-  </form>
+<body>
+  <header role="banner" class="searchToggle">
+    <h1>DJ Tonight</h1>
+    <h2 class="lblSpotifyStatus" hidden>You are now logged in to Spotify</h2>
+  </header>
+  <main role="main">
+    <div id="map"></div>
+    <h2 class="searchToggle">Looking for a DJ/Electronic show this evening in your town?</h2>
+    <h5 class="searchToggle lblSpotifyRequired">A Spotify account is required to search so please be ready to authenticate</h5>
+    <form id="frmSpotify">
+      <button class="btnLoginSpotify">Log in with Spotify</button>
+    </form>
+    <form id="frmSearch" class="searchToggle" hidden>
+      <fieldset>
+        <legend>Enter your Location:</legend>
+        <label for="city"></label>
+        <input id="city" value="Denver" />
+        <label for="state"></label>
+        <input id="state" value="CO" />
+        <button class="btnSubmit">Search</button>
+      </fieldset>
+    </form>
+    <form id="frmEventMap" hidden>
+      <div class="js-results" aria-live="assertive"></div>
+    </form>
+  </main>
   <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
   <script type='text/javascript' src='js/constants.js'></script>
+  <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJa2H-XH59JxiczNe0t6G6yZcRIqBMpN8&callback=initMap"
+    defer async></script>
   <script type='text/javascript' src='js/index.js'></script>
   <script type='text/javascript' src='js/spotifyauth.js'></script>
+
 </body>
+
 </html>

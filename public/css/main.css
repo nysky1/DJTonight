@@ -1,1 +1,52 @@
 * { box-sizing:border-box; }
+
+#map {
+    height: 0;
+    width: 0;
+    z-index:1;
+    position: absolute;
+     overflow: visible;
+    top:0;
+    left:0;
+    z-index: -9999;
+    
+}
+#map.display {
+    height: 100%;
+    width:100%;
+    z-index: 10;
+}
+/* Optional: Makes the sample page fill the window. */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+header {
+    margin:0;
+    padding:0;
+}
+header h1 {
+    margin:0 !important;
+    padding:0 !important;
+}
+main {
+    width:100%;
+}
+body {    
+    background:url('../images/bg.jpg') center center;
+    box-shadow: 0 0 250px 250px white inset;
+}
+body.noBox {
+    box-shadow: 0 0 0 0;
+}
+
+.js-results {
+    width:30%;
+    background:white;
+    position: absolute;
+    width:300px;
+    height:100%;
+    overflow:scroll;
+    z-index:20;
+}
