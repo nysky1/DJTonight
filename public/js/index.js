@@ -22,7 +22,6 @@ function prepareSpotifyTopTracksAPIURL(artistId) {
   return SPOTIFY_API_TOP_TRACKS_URL.replace('~ARTIST_ID~', artistId);
 }
 
-
 function eventMaker(name, artist, venue, eventDate, city, lat, lng, popularity) {
   let thisEvent = {
     name: name,
@@ -145,7 +144,7 @@ function showResults(events) {
   let sArray = sortArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
 
-  $('.js-results').html(resultsHTML).append('<button class="btnBack">Change City</button><div class="spacer"></div><iframe class="embedPlayer" src=" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
+  $('.js-results').html(resultsHTML).append('<button class="btnBack">Change City</button><div class="spacer"></div><iframe class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
 
   toggleState(STATE_RESULTS);
   setMarkers();
@@ -284,21 +283,30 @@ function handleSpotifySearch(artist) {
          .done(function (results) {
            dWrite('Returned with Top Tracks');
          })
-        // .fail(function (result) {
-        //   alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
-        //   dWrite(result.statusText);
-        // })
+         .fail(function (result) {
+           alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
+           dWrite(result.statusText);
+        })
       )
     })
     .fail(function (result) {
-      alert(`Oops, the Spotify API Artist Lookup failed - ${result.statusText} (${result.status})!`);
+      alert(`Oops, the Spotify API Artist Lookup failed - ${result.statusText}!`);
       dWrite(result.statusText);
     })
 };
 function displayPlayer(results) {
-  let artistIdURI = results.artists.items[0].uri;
-  let embedURI = `https://open.spotify.com/embed?uri=${artistIdURI}`;
-  $('.embedPlayer').attr("src",embedURI).addClass("display");
+  var deferred = $.Deferred();
+  let artistIdURI;
+  let embedURI;
+  try {
+    artistIdURI = results.artists.items[0].uri;
+    embedURI = `https://open.spotify.com/embed?uri=${artistIdURI}`;
+    $('.embedPlayer').attr("src",embedURI).addClass("display");
+    return deferred.resolve();
+  }
+  catch (e) {
+    return deferred.reject( {statusText: e.stack });
+  }  
 }
 function handleBackfromSearch() {
   $('.js-results').on('click', '.btnBack', function (event) {
