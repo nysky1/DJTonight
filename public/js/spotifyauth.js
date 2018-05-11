@@ -30,7 +30,7 @@ function loginToSpotify() {
 }
 function checkToken() {
     if (localStorage[CONST_ACCESS_TOKEN_KEY] !== undefined) {
-        toggleState(1);
+        toggleState(STATE_CITY_SEARCH);
         dWrite('Toggle State to next Form');
     }
 }

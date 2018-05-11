@@ -3,24 +3,45 @@
 #map {
     height: 0;
     width: 0;
-    z-index:1;
     position: absolute;
-     overflow: visible;
+    overflow: visible;
     top:0;
     left:0;
     z-index: -9999;
-    
 }
 #map.display {
     height: 100%;
-    width:100%;
+    width:70%;
+    margin-left:30%;
     z-index: 10;
 }
+
+#legend {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    padding: 10px;
+    margin: 10px;
+    border: 3px solid #000;
+  }
+  #legend h3 {
+    margin-top: 0;
+  }
+  #legend img {
+    vertical-align: middle;
+  }
+  .mapIconLabel {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+    font-family: 'Arial';
+    background: blue;
+}
+
 /* Optional: Makes the sample page fill the window. */
 html, body {
     height: 100%;
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
 }
 header {
     margin:0;
@@ -32,10 +53,11 @@ header h1 {
 }
 main {
     width:100%;
+    height: 100%;
 }
 body {    
     background:url('../images/bg.jpg') center center;
-    box-shadow: 0 0 250px 250px white inset;
+    box-shadow: 0 0 270px 270px white inset;
 }
 body.noBox {
     box-shadow: 0 0 0 0;
@@ -44,9 +66,17 @@ body.noBox {
 .js-results {
     width:30%;
     background:white;
-    position: absolute;
-    width:300px;
+    position: relative;
     height:100%;
     overflow:scroll;
     z-index:20;
+    padding:10px;
+}
+
+.js-panel-list-wrapper {
+    display: block;
+    padding-bottom: 10px;
+}
+.eventName {
+    font-weight: bold;
 }
