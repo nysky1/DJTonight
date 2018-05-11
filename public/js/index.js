@@ -145,7 +145,7 @@ function showResults(events) {
   let sArray = sortArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
 
-  $('.js-results').html(resultsHTML).append('<button class="btnBack">Change City</button><div class="spacer"></div>');
+  $('.js-results').html(resultsHTML).append('<button class="btnBack">Change City</button><div class="spacer"></div><iframe class="embedPlayer" src=" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
 
   toggleState(STATE_RESULTS);
   setMarkers();
@@ -279,16 +279,15 @@ function handleSpotifySearch(artist) {
   $.when(
     getSpotifyArtistId(artist))
     .done(function (results) {
-      $.when (
-        getSpotifyTopTracks(results)
-        .done(function (results) {
-          dWrite('Returned with Top Tracks');
-          displayPlayer(results);
-        })
-        .fail(function (result) {
-          alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
-          dWrite(result.statusText);
-        })
+      $.when (        
+        displayPlayer(results)
+         .done(function (results) {
+           dWrite('Returned with Top Tracks');
+         })
+        // .fail(function (result) {
+        //   alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
+        //   dWrite(result.statusText);
+        // })
       )
     })
     .fail(function (result) {
@@ -297,8 +296,9 @@ function handleSpotifySearch(artist) {
     })
 };
 function displayPlayer(results) {
-  let embedURI = 'https://open.spotify.com/artist/7w1eTNePApzDk8XtgykCPS' 
-  $('.embedPlayer').attr("src",embedURI);
+  let artistIdURI = results.artists.items[0].uri;
+  let embedURI = `https://open.spotify.com/embed?uri=${artistIdURI}`;
+  $('.embedPlayer').attr("src",embedURI).addClass("display");
 }
 function handleBackfromSearch() {
   $('.js-results').on('click', '.btnBack', function (event) {
