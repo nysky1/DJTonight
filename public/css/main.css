@@ -80,3 +80,6 @@ body.noBox {
 .eventName {
     font-weight: bold;
 }
+.spacer {
+    height:30px;
+}

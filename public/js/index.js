@@ -5,7 +5,7 @@ const SONGKICK_API_LOCATION_URL = 'http://api.songkick.com/api/3.0/search/locati
 const SONGKICK_API_CALENDAR_URL = 'http://api.songkick.com/api/3.0/metro_areas/~METRO_ID~/calendar.json'; //http://api.songkick.com/api/3.0/metro_areas/6404/calendar.json?apikey=ABC
 
 const SPOTIFY_API_SEARCH_URL = 'https://api.spotify.com/v1/search';
-const SPOTIFY_API_TOP_TRACKS_URL = 'https://api.spotify.com/v1/~ARTIST_ID~/top-tracks'
+const SPOTIFY_API_TOP_TRACKS_URL = 'https://api.spotify.com/v1/artists/~ARTIST_ID~/top-tracks'
 
 const MAPS_API_KEY = 'AIzaSyCJa2H-XH59JxiczNe0t6G6yZcRIqBMpN8'
 
@@ -99,6 +99,7 @@ function getSpotifyTopTracks(artistList) {
     url: prepareSpotifyTopTracksAPIURL(artistId),
     data: request,
     type: 'GET',
+    dataType: 'json',
     beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); },
     //success: function () { alert('Success!'); },
     error: function (xhr, textStatus, errorThrown) { alert(errorThrown); }
@@ -144,7 +145,7 @@ function showResults(events) {
   let sArray = sortArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
 
-  $('.js-results').html(resultsHTML).append('<button class="btnBack">Change City</button>');
+  $('.js-results').html(resultsHTML).append('<button class="btnBack">Change City</button><div class="spacer"></div>');
 
   toggleState(STATE_RESULTS);
   setMarkers();
@@ -239,7 +240,7 @@ function validateLocationSetAndContinue(results) {
   metroId = results.resultsPage.results.location["0"].metroArea.id;
   return defer.resolve(metroId);
 }
-function handleSearch() {
+function handleSearchForLocationAndEvents() {
   $('.btnSubmit').click((event) => {
     event.preventDefault();
     eventsForMap.length = 0;
@@ -278,11 +279,11 @@ function handleSpotifySearch(artist) {
   $.when(
     getSpotifyArtistId(artist))
     .done(function (results) {
-      dWrite(results);
       $.when (
         getSpotifyTopTracks(results)
         .done(function (results) {
-          alert('back');
+          dWrite('Returned with Top Tracks');
+          displayPlayer(results);
         })
         .fail(function (result) {
           alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
@@ -295,7 +296,10 @@ function handleSpotifySearch(artist) {
       dWrite(result.statusText);
     })
 };
-
+function displayPlayer(results) {
+  let embedURI = 'https://open.spotify.com/artist/7w1eTNePApzDk8XtgykCPS' 
+  $('.embedPlayer').attr("src",embedURI);
+}
 function handleBackfromSearch() {
   $('.js-results').on('click', '.btnBack', function (event) {
     toggleState(STATE_BACK_TO_SEARCH);
@@ -309,7 +313,7 @@ function handleArtistClick() {
   });
 }
 function loadEventWatchers() {
-  handleSearch();
+  handleSearchForLocationAndEvents();
   handleBackfromSearch();
   handleArtistClick();
 }
@@ -343,4 +347,4 @@ function dWrite(item) {
 }
 
 $(loadApp());
-//watch the submit button
+//watch the submit button 
