@@ -1,11 +1,11 @@
 'use strict';
-const isDebug = true;
 const SONGKICK_API_KEY = 'YNtS7YGARCxD6b3X';
 const SONGKICK_API_LOCATION_URL = 'http://api.songkick.com/api/3.0/search/locations.json'; //http://api.songkick.com/api/3.0/search/locations.json?query=Denver,CO&apikey=ABC
 const SONGKICK_API_CALENDAR_URL = 'http://api.songkick.com/api/3.0/metro_areas/~METRO_ID~/calendar.json'; //http://api.songkick.com/api/3.0/metro_areas/6404/calendar.json?apikey=ABC
 
 const SPOTIFY_API_SEARCH_URL = 'https://api.spotify.com/v1/search';
-const SPOTIFY_API_TOP_TRACKS_URL = 'https://api.spotify.com/v1/artists/~ARTIST_ID~/top-tracks'
+const SPOTIFY_API_TOP_TRACKS_URL = 'https://api.spotify.com/v1/artists/~ARTIST_ID~/top-tracks';
+const SPOTIFY_API_PAUSE = 'https://api.spotify.com/v1/me/player/pause';
 
 const MAPS_API_KEY = 'AIzaSyCJa2H-XH59JxiczNe0t6G6yZcRIqBMpN8'
 
@@ -21,7 +21,17 @@ function prepareSongKickAPIURL(metroId) {
 function prepareSpotifyTopTracksAPIURL(artistId) {
   return SPOTIFY_API_TOP_TRACKS_URL.replace('~ARTIST_ID~', artistId);
 }
+function pausePlayback() {
+  dWrite('Calling SPOTIFY API - Pause Playback');
 
+  return $.ajax({
+    url: SPOTIFY_API_PAUSE,
+    type: 'PUT',
+    data: {},
+    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); }
+    //,error: function (xhr, textStatus, errorThrown) { dWrite('Unable to pause playback'); }
+  })
+}
 function eventMaker(name, artist, venue, eventDate, city, lat, lng, popularity) {
   let thisEvent = {
     name: name,
@@ -36,7 +46,6 @@ function eventMaker(name, artist, venue, eventDate, city, lat, lng, popularity) 
   }
   return thisEvent;
 }
-
 function getSongKickLocation() {
   dWrite('Calling SongKick API Location');
 
@@ -84,7 +93,6 @@ function getSpotifyArtistId(aristName) {
     data: request,
     type: 'GET',
     beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); },
-    //success: function () { alert('Success!'); },
     error: function (xhr, textStatus, errorThrown) { alert(errorThrown); }
   })
 }
@@ -139,12 +147,13 @@ function showResults(events) {
   }
   //build the event results HTML (refactor)
   for (let i = 0; i < eventsForMap.length; i++) {
-    resultsHTML += `<div class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'><div class='eventName'>${eventsForMap[i].name} - (${eventsForMap[i].popularity})</div><div>${eventsForMap[i].venue}</div></div>`;
+    //resultsHTML += `<div class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'><div class='eventName'><i class="fa fa-spotify" aria-hidden="true"></i> ${(i+1)}. ${eventsForMap[i].name})</div><div></div></div>`;
+    resultsHTML += `<div class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'><div class='eventName'>${(i+1)}. ${eventsForMap[i].name})</div><div></div></div>`;
   }
   let sArray = sortArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
 
-  $('.js-results').html(resultsHTML).append('<button class="btnBack">Change City</button><div class="spacer"></div><iframe class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
+  $('.js-results').html('<button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button><div class="headerEvents">Hottest Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div>').append(resultsHTML).append('<div class="spacer"></div><iframe class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
 
   toggleState(STATE_RESULTS);
   setMarkers();
@@ -215,19 +224,20 @@ function toggleState(stateIndex) {
       $('.lblSpotifyStatus').html('You are logged in to Spotify').prop('hidden', false);
       break;
     case 2:
-
       $('.js-results').prop('hidden', false);
       $('#frmSearch').prop('hidden', true);
       $('.searchToggle').prop('hidden', true);
       $('#map').addClass('display');
       $('body').addClass('noBox');
+      $('.header-overlay').prop('hidden',false);
       break;
-    case 3:
+    case 3: //return to search
       $('.js-results').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
       $('body').removeClass('noBox');
+      $('.header-overlay').prop('hidden',true);
   }
 }
 function validateLocationSetAndContinue(results) {
@@ -275,7 +285,7 @@ function handleSearchForLocationAndEvents() {
   });
 }
 function handleSpotifySearch(artist) {
-  $.when(
+  return $.when( //followup on return
     getSpotifyArtistId(artist))
     .done(function (results) {
       $.when (        
@@ -301,7 +311,8 @@ function displayPlayer(results) {
   try {
     artistIdURI = results.artists.items[0].uri;
     embedURI = `https://open.spotify.com/embed?uri=${artistIdURI}`;
-    $('.embedPlayer').attr("src",embedURI).addClass("display");
+    $('.embedPlayer').attr("src",embedURI);
+    togglePlayerDisplay(true);
     return deferred.resolve();
   }
   catch (e) {
@@ -311,21 +322,46 @@ function displayPlayer(results) {
 function handleBackfromSearch() {
   $('.js-results').on('click', '.btnBack', function (event) {
     toggleState(STATE_BACK_TO_SEARCH);
+    pausePlayback();
   })
+}
+function togglePlayerDisplay(show) {
+  if (show) {
+    $('.embedPlayer').addClass("display").fadeIn("slow");
+  }
+  else {
+    $('.embedPlayer').fadeOut("fast");
+  }
 }
 function handleArtistClick() {
   let artist;
   $('.js-results').on('click', '.js-panel-list-wrapper', function (event) {
+    togglePlayerDisplay(false);
     artist = $(event.currentTarget).attr('aria-artist');
-    handleSpotifySearch(artist);
-  });
+    $.when (
+      handleSpotifySearch(artist))
+      .done(function() {
+        $.when(pausePlayback())
+        .done(function () {
+          dWrite("Paused");
+        })
+        .fail(function (result) {
+          if (result.status !== 403 && result.status !== 404) { //already paused = 403
+            alert('Sorry, but Spotify needs you to login again.');
+            //window.location.href = "/"; 
+          }
+        })
+      })
+      .fail(function(error) {
+       alert(error);
+      })
+}); //click
 }
 function loadEventWatchers() {
   handleSearchForLocationAndEvents();
   handleBackfromSearch();
   handleArtistClick();
 }
-
 function loadApp() {
   loadEventWatchers();
 }

@@ -1,4 +1,6 @@
+const isDebug = true;
 const CONST_ACCESS_TOKEN_KEY = "access_token";
+const CONST_ACCESS_TOKEN_KEY_EXPIRATION = "access_token_expiration";
 
 const STATE_CITY_SEARCH = 1;
 const STATE_RESULTS = 2;

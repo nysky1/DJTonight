@@ -1,6 +1,6 @@
 'use strict';
 const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
-const SPOTIFY_AUTH_SCOPE = ''
+const SPOTIFY_AUTH_SCOPE = 'user-modify-playback-state'
 //const SPOTIFY_AUTH_STATE_KEY = 'spotify_auth_state' //for localstorage
 const SPOTIFY_CLIENT_ID = 'b43719f00c1248cda82e9ef99c537d9a'
 
@@ -29,7 +29,9 @@ function loginToSpotify() {
     window.location = url;
 }
 function checkToken() {
-    if (localStorage[CONST_ACCESS_TOKEN_KEY] !== undefined) {
+    let currDate = new Date()
+    let expirDate = new Date(localStorage[CONST_ACCESS_TOKEN_KEY_EXPIRATION]);
+    if (localStorage[CONST_ACCESS_TOKEN_KEY] !== undefined && expirDate > currDate) {
         toggleState(STATE_CITY_SEARCH);
         dWrite('Toggle State to next Form');
     }

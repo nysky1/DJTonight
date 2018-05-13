@@ -15,26 +15,13 @@
     margin-left:30%;
     z-index: 10;
 }
-
-#legend {
-    font-family: Arial, sans-serif;
-    background: #fff;
-    padding: 10px;
-    margin: 10px;
-    border: 3px solid #000;
-  }
-  #legend h3 {
-    margin-top: 0;
-  }
-  #legend img {
-    vertical-align: middle;
-  }
-  .mapIconLabel {
-    font-size: 15px;
-    font-weight: bold;
-    color: #FFFFFF;
-    font-family: 'Arial';
-    background: blue;
+button {
+    padding:10px;
+    border-radius: 5px;
+}
+.btnBack {
+    background-color: #fff;
+    color:#000;
 }
 
 /* Optional: Makes the sample page fill the window. */
@@ -42,10 +29,23 @@ html, body {
     height: 100%;
     margin: 0px;
     padding: 0px;
+    font-family: 'rubik','sans-serif'; 
+}
+header,main {
+    margin:0 auto;
+    padding:0px 0 0 0;
+    text-align: center;
 }
 header {
+    padding:10px 0 0 0;
+}
+main h3 {
     margin:0;
-    padding:0;
+    padding:0 0 8px 0;
+}
+main h4 {
+    margin:0;
+    padding:10px 0 5px 0;
 }
 header h1 {
     margin:0 !important;
@@ -57,28 +57,64 @@ main {
 }
 body {    
     background:url('../images/bg.jpg') center center;
-    box-shadow: 0 0 270px 270px white inset;
+    box-shadow: 0 0 300px 300px white inset;
 }
 body.noBox {
     box-shadow: 0 0 0 0;
 }
-
+.header-overlay {
+    margin:10px auto;
+    position:fixed;
+    top:0;
+    width: 100%;
+    left: 15%; /*split the 30% width*/
+    z-index: 1000;
+    text-align: center;
+}
+.header-overlay h1 {
+    color: #DA5B59;
+    text-shadow: 1px 1px #555, 2px 2px 3px #555;
+}
 .js-results {
     width:30%;
-    background:white;
+    /* background: #E0DFD5; */
+    background: #000;
+    color:white;
     position: relative;
     height:100%;
     overflow:scroll;
     z-index:20;
     padding:10px;
+    text-align: left;
 }
-
 .js-panel-list-wrapper {
     display: block;
-    padding-bottom: 10px;
+    padding: 10px 5px;
+    min-height: 50px;
+    background: url('../images/Spotify_Icon_RGB_Green.png') center left no-repeat;
+    background-position-x: 5px;
+    background-size: 25px;
 }
-.eventName {
+.js-panel-list-wrapper:hover {
+    background-color:#fff;
+    color:black;
+    cursor: pointer;
+}
+.headerEvents {
+    padding:10px 5px 5px 5px;
+    font-size:24px;
+    color: #DA5B59;
+}
+.headerEventsSubtitle {
+    padding:0px 30px 5px 5px;
+}
+.eventName{
     font-weight: bold;
+    padding-left:30px;
+}
+
+.fa-spotify {
+    color: #1DB954;
 }
 .spacer {
     height:30px;
@@ -86,4 +122,14 @@ body.noBox {
 .embedPlayer.display {
     width:100%;
     height:300px;
+    display:none;
+}
+.footer {
+    color:#000;
+    position: fixed;
+    left:0;
+    bottom:10px;
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
 }
