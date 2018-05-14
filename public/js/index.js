@@ -373,9 +373,6 @@ function loadEventWatchers() {
   handleBackfromSearch();
   handleArtistClick();
 }
-function loadApp() {
-  loadEventWatchers();
-}
 /* UTILITIES */
 function formatISODate(dt) {
   function pad(number) {
@@ -401,5 +398,5 @@ function dWrite(item) {
   (isDebug) ? console.log(`${item}`) : '';
 }
 
-$(loadApp());
+$(loadEventWatchers());
 //watch the submit button 
