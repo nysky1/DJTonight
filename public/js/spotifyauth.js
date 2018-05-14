@@ -32,7 +32,7 @@ function checkToken() {
     let currDate = new Date()
     let expirDate = new Date(localStorage[CONST_ACCESS_TOKEN_KEY_EXPIRATION]);
     if (localStorage[CONST_ACCESS_TOKEN_KEY] !== undefined && expirDate > currDate) {
-        toggleState(STATE_CITY_SEARCH);
+        toggleFormState(STATE_CITY_SEARCH);
         dWrite('Toggle State to next Form');
     }
 }

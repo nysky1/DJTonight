@@ -21,17 +21,7 @@ function prepareSongKickAPIURL(metroId) {
 function prepareSpotifyTopTracksAPIURL(artistId) {
   return SPOTIFY_API_TOP_TRACKS_URL.replace('~ARTIST_ID~', artistId);
 }
-function pausePlayback() {
-  dWrite('Calling SPOTIFY API - Pause Playback');
-
-  return $.ajax({
-    url: SPOTIFY_API_PAUSE,
-    type: 'PUT',
-    data: {},
-    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); }
-    //,error: function (xhr, textStatus, errorThrown) { dWrite('Unable to pause playback'); }
-  })
-}
+/* BEGIN - SHOWS Object and Helper Methods */
 function eventMaker(name, artist, venue, eventDate, city, lat, lng, popularity) {
   let thisEvent = {
     name: name,
@@ -46,11 +36,24 @@ function eventMaker(name, artist, venue, eventDate, city, lat, lng, popularity) 
   }
   return thisEvent;
 }
+function updateEventWithMostPopular(mostPopEvent) {
+
+  let bigEvent = eventsForMap.find((item) => {
+    return item.name === mostPopEvent.name
+  })
+  bigEvent.mostPopular = true;
+}
+function sortEventArrayByPopularity() {
+  return eventsForMap.sort((a, b) => {
+    return b.popularity - a.popularity
+  })
+}
+/* END - SHOWS Object and Helper Methods */
+/* BEGIN - SONGKICK METHODS */
 function getSongKickLocation() {
   dWrite('Calling SongKick API Location');
 
   let location = $('#city').val() + "," + $("#state").val();
-
   let request = {
     query: `${location}`,
     apikey: SONGKICK_API_KEY
@@ -79,6 +82,9 @@ function getSongKickEvents(metroId) {
     type: 'GET'
   });
 }
+/* END - SONGKICK METHODS */
+
+/* BEGIN - SPOTIFY METHODS */
 function getSpotifyArtistId(aristName) {
   dWrite('Calling SPOTIFY API - Get Artist Id');
 
@@ -108,22 +114,42 @@ function getSpotifyTopTracks(artistList) {
     type: 'GET',
     dataType: 'json',
     beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); },
-    //success: function () { alert('Success!'); },
     error: function (xhr, textStatus, errorThrown) { alert(errorThrown); }
   })
 }
-function checkGenres(results, thisEvent) {
-  dWrite(results.artists.items[0]);
-  thisEvent.isEDM = true;
-  eventsForMap.push(thisEvent);
-}
-function updateEventWithMostPopular(mostPopEvent) {
+function handleSpotifySearch(artist) {
+  return $.when( 
+    getSpotifyArtistId(artist))
+    .done(function (results) {
+      $.when (        
+        displayPlayer(results)
+         .done(function (results) {
+           dWrite('Returned with Top Tracks');
+         })
+         .fail(function (result) {
+           alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
+           dWrite(result.statusText);
+        })
+      )
+    })
+    .fail(function (result) {
+      alert(`Oops, the Spotify API Artist Lookup failed - ${result.statusText}!`);
+      dWrite(result.statusText);
+    })
+};
+function pausePlayback() {
+  dWrite('Calling SPOTIFY API - Pause Playback');
 
-  let bigEvent = eventsForMap.find((item) => {
-    return item.name === mostPopEvent.name
+  return $.ajax({
+    url: SPOTIFY_API_PAUSE,
+    type: 'PUT',
+    data: {},
+    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); }
   })
-  bigEvent.mostPopular = true;
 }
+/* END - SPOTIFY METHODS */
+
+/* BEBIN - UI DISPLAY METHODS */
 function showResults(events) {
   let resultsHTML = '';
   let arySortedByPopularity = [];
@@ -147,82 +173,19 @@ function showResults(events) {
   }
   //build the event results HTML (refactor)
   for (let i = 0; i < eventsForMap.length; i++) {
-    //resultsHTML += `<div class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'><div class='eventName'><i class="fa fa-spotify" aria-hidden="true"></i> ${(i+1)}. ${eventsForMap[i].name})</div><div></div></div>`;
     resultsHTML += `<li class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'>
     <h3 class='eventName'>${(i+1)}. ${eventsForMap[i].name}</div>
     <div></li>`;
   }
-  let sArray = sortArrayByPopularity();
+  let sArray = sortEventArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
 
   $('.js-results').html('<li class="liBack"><button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button></li><li><div class="headerEvents">Tonight&#39;s Hottest Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div></li>').append(resultsHTML).append('<div class="spacer"></div><iframe class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
 
-  toggleState(STATE_RESULTS);
+  toggleFormState(STATE_RESULTS);
   setMarkers();
 }
-/* BEGIN Map Functions */
-function initMap() {
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: 36.0237614, lng: -107.7637304 },
-    zoom: 12,
-    zoomControlOptions: {
-      position: google.maps.ControlPosition.LEFT_CENTER
-  }
-  });
-}
-// Adds markers to the map.
-function setMarkers() {
-
-  let bounds = new google.maps.LatLngBounds();
-  //re-use only 1 info window
-  let infowindow = new google.maps.InfoWindow( { 
-    maxWidth: '280'
-  });
-
-  // Shapes define the clickable region of the icon. The type defines an HTML
-  // <area> element 'poly' which traces out a polygon as a series of X,Y points.
-  // The final coordinate closes the poly by connecting to the first coordinate.
-  let shape = {
-    coords: [1, 1, 1, 20, 18, 20, 18, 1],
-    type: 'poly'
-  };
-  for (var i = 0; i < eventsForMap.length; i++) {
-    let beach = eventsForMap[i];
-    let marker = new google.maps.Marker({
-      position: { lat: eventsForMap[i].lat, lng: eventsForMap[i].lng },
-      map: map,
-      //icon: (eventsForMap[i].mostPopular) ? pinImageBigEvent : pinImage,
-
-      icon: {
-        url: '/images/blank-marker.png',
-        labelOrigin: new google.maps.Point(18, 13)
-      },
-      //shape: shape,
-      label: {
-        text: "" + (i + 1),
-        fontWeight: 'bold'
-      },
-      title: eventsForMap[i].name,
-      zIndex: 9999
-    });
-    google.maps.event.addListener(marker, 'click', (function (marker, i) {
-      return function () {
-        infowindow.setContent(`<h3>${eventsForMap[i].name}</h3><h4>${formatDateTime(eventsForMap[i].eventDate)}</h4>`);
-        infowindow.open(map, marker);
-      }
-    })(marker, i));
-    bounds.extend(marker.position);
-  }
-  map.fitBounds(bounds);
-}
-/* END MAP FUNCTIONS */
-
-function sortArrayByPopularity() {
-  return eventsForMap.sort((a, b) => {
-    return b.popularity - a.popularity
-  })
-}
-function toggleState(stateIndex) {
+function toggleFormState(stateIndex) {
   switch (stateIndex) {
     case 1:
       $('#frmSpotify').prop('hidden', true);
@@ -247,6 +210,33 @@ function toggleState(stateIndex) {
       $('.header-overlay').prop('hidden',true);
   }
 }
+function displayPlayer(results) {
+  var deferred = $.Deferred();
+  let artistIdURI;
+  let embedURI;
+  try {
+    artistIdURI = results.artists.items[0].uri;
+    embedURI = `https://open.spotify.com/embed?uri=${artistIdURI}`;
+    $('.embedPlayer').attr("src",embedURI);
+    togglePlayerDisplay(true);
+    return deferred.resolve();
+  }
+  catch (e) {
+    return deferred.reject( {statusText: e.stack });
+  }  
+}
+function togglePlayerDisplay(show) {
+  if (show) {
+    $('.embedPlayer').addClass("display").fadeIn("slow"); 
+
+    setTimeout(function () {$('.js-results-parent').animate({
+      scrollTop: 300
+  }, 1000); }),500;
+  }
+  else {
+    $('.embedPlayer').fadeOut("fast");
+  }
+}
 function validateLocationSetAndContinue(results) {
   let metroId;
   var defer = $.Deferred();
@@ -255,6 +245,39 @@ function validateLocationSetAndContinue(results) {
   }
   metroId = results.resultsPage.results.location["0"].metroArea.id;
   return defer.resolve(metroId);
+} 
+/* END - UI DISPLAY METHODS */
+
+/* BEGIN - Main Events Functions */
+function handleArtistClick() {
+  let artist;
+  $('.js-results').on('click', '.js-panel-list-wrapper', function (event) {
+    togglePlayerDisplay(false);
+    artist = $(event.currentTarget).attr('aria-artist');
+    $.when (
+      handleSpotifySearch(artist))
+      .done(function() {
+        $.when(pausePlayback())
+        .done(function () {
+          dWrite("Paused");
+        })
+        .fail(function (result) {
+          if (result.status !== 403 && result.status !== 404) { //already paused = 403
+            alert('Sorry, but Spotify needs you to login again.');
+            window.location.href = "/"; 
+          }
+        })
+      })
+      .fail(function(error) {
+       alert(error);
+      })
+}); //end click
+} //end function
+function handleBackfromSearch() {
+  $('.js-results').on('click', '.btnBack', function (event) {
+    toggleFormState(STATE_BACK_TO_SEARCH);
+    pausePlayback();
+  })
 }
 function handleSearchForLocationAndEvents() {
   $('.btnSubmit').click((event) => {
@@ -292,7 +315,7 @@ function handleSearchForLocationAndEvents() {
   });
 }
 function handleSpotifySearch(artist) {
-  return $.when( //followup on return
+  return $.when( 
     getSpotifyArtistId(artist))
     .done(function (results) {
       $.when (        
@@ -311,68 +334,68 @@ function handleSpotifySearch(artist) {
       dWrite(result.statusText);
     })
 };
-function displayPlayer(results) {
-  var deferred = $.Deferred();
-  let artistIdURI;
-  let embedURI;
-  try {
-    artistIdURI = results.artists.items[0].uri;
-    embedURI = `https://open.spotify.com/embed?uri=${artistIdURI}`;
-    $('.embedPlayer').attr("src",embedURI);
-    togglePlayerDisplay(true);
-    return deferred.resolve();
-  }
-  catch (e) {
-    return deferred.reject( {statusText: e.stack });
-  }  
-}
-function handleBackfromSearch() {
-  $('.js-results').on('click', '.btnBack', function (event) {
-    toggleState(STATE_BACK_TO_SEARCH);
-    pausePlayback();
-  })
-}
-function togglePlayerDisplay(show) {
-  if (show) {
-    $('.embedPlayer').addClass("display").fadeIn("slow"); 
-
-    setTimeout(function () {$('.js-results-parent').animate({
-      scrollTop: 300
-  }, 1000); }),500;
-  }
-  else {
-    $('.embedPlayer').fadeOut("fast");
-  }
-}
-function handleArtistClick() {
-  let artist;
-  $('.js-results').on('click', '.js-panel-list-wrapper', function (event) {
-    togglePlayerDisplay(false);
-    artist = $(event.currentTarget).attr('aria-artist');
-    $.when (
-      handleSpotifySearch(artist))
-      .done(function() {
-        $.when(pausePlayback())
-        .done(function () {
-          dWrite("Paused");
-        })
-        .fail(function (result) {
-          if (result.status !== 403 && result.status !== 404) { //already paused = 403
-            alert('Sorry, but Spotify needs you to login again.');
-            window.location.href = "/"; 
-          }
-        })
-      })
-      .fail(function(error) {
-       alert(error);
-      })
-}); //click
-}
+/* END - Main Event Callback Functions */
 function loadEventWatchers() {
   handleSearchForLocationAndEvents();
   handleBackfromSearch();
   handleArtistClick();
 }
+/* BEGIN Map Functions */
+function initMap() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: 36.0237614, lng: -107.7637304 },
+    zoom: 12,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.LEFT_CENTER
+  }
+  });
+}
+// Adds markers to the map.
+function setMarkers() {
+
+  let bounds = new google.maps.LatLngBounds();
+  //re-use only 1 info window
+  let infowindow = new google.maps.InfoWindow( { 
+    maxWidth: '280'
+  });
+
+  // Shapes define the clickable region of the icon. The type defines an HTML
+  // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+  // The final coordinate closes the poly by connecting to the first coordinate.
+  let shape = {
+    coords: [1, 1, 1, 20, 18, 20, 18, 1],
+    type: 'poly'
+  };
+  for (var i = 0; i < eventsForMap.length; i++) {
+    let beach = eventsForMap[i];
+    let marker = new google.maps.Marker({
+      position: { lat: eventsForMap[i].lat, lng: eventsForMap[i].lng },
+      map: map,
+
+      icon: {
+        url: '/images/blank-marker.png',
+        labelOrigin: new google.maps.Point(18, 13)
+      },
+      shape: shape,
+      label: {
+        text: "" + (i + 1),
+        fontWeight: 'bold'
+      },
+      title: eventsForMap[i].name,
+      zIndex: 9999
+    });
+    google.maps.event.addListener(marker, 'click', (function (marker, i) {
+      return function () {
+        infowindow.setContent(`<h3>${eventsForMap[i].name}</h3><h4>${formatDateTime(eventsForMap[i].eventDate)}</h4>`);
+        infowindow.open(map, marker);
+      }
+    })(marker, i));
+    bounds.extend(marker.position);
+  }
+  map.fitBounds(bounds);
+}
+/* END MAP FUNCTIONS */
+
 /* UTILITIES */
 function formatISODate(dt) {
   function pad(number) {
@@ -399,4 +422,3 @@ function dWrite(item) {
 }
 
 $(loadEventWatchers());
-//watch the submit button 
