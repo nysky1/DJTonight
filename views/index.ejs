@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>What's Hot Tonight!</title>
+  <title>What's Hot Tonight?</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" />
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
@@ -15,7 +15,7 @@
 </head>
 <body>
   <header role="banner" class="searchToggle">
-    <h1>What's Hot Tonight</h1>
+    <h1>What's Hot Tonight?</h1>
    </header>
   <main role="main">
     <h3 class="searchToggle">Discover the hottest music shows in your area tonight!</h3>
@@ -27,19 +27,23 @@
     </form>
     <form id="frmSearch" class="searchToggle" hidden>
       <fieldset>
-        <legend>Enter your Location:</legend>
+        <legend>Enter your Location</legend>
         <label for="city"></label>
         <input id="city" value="Denver" placeholder="Your City" />
         <label for="state"></label>
         <input id="state" value="CO" placeholder="Your State/Country" />
-        <button class="btnSubmit">Search</button>
+       
       </fieldset>
+      <button class="btnSubmit">Search</button>
     </form>
     <div class="header-overlay" hidden>
-      <h1>Tonight's Hottest Local Events</h1>
+      <h1>Hot Events</h1>
     </div>
-    <div class="js-results" aria-live="assertive" hidden></div>
     <div id="map"></div>
+    <div class="js-results-parent" aria-live="assertive" hidden>
+      <ul class="js-results"></ul>
+    </div>
+
     <div class="footer" role="contentinfo">Background image courtesy of <a target="_new" href="https://www.facebook.com/SimonMillsUK/">Simon Mills/Bent</a></div>    
 
   </main>

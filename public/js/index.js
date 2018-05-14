@@ -148,12 +148,14 @@ function showResults(events) {
   //build the event results HTML (refactor)
   for (let i = 0; i < eventsForMap.length; i++) {
     //resultsHTML += `<div class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'><div class='eventName'><i class="fa fa-spotify" aria-hidden="true"></i> ${(i+1)}. ${eventsForMap[i].name})</div><div></div></div>`;
-    resultsHTML += `<div class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'><div class='eventName'>${(i+1)}. ${eventsForMap[i].name})</div><div></div></div>`;
+    resultsHTML += `<li class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'>
+    <h3 class='eventName'>${(i+1)}. ${eventsForMap[i].name}</div>
+    <div></li>`;
   }
   let sArray = sortArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
 
-  $('.js-results').html('<button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button><div class="headerEvents">Hottest Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div>').append(resultsHTML).append('<div class="spacer"></div><iframe class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
+  $('.js-results').html('<li class="liBack"><button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button></li><li><div class="headerEvents">Tonight&#39;s Hottest Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div></li>').append(resultsHTML).append('<div class="spacer"></div><iframe class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
 
   toggleState(STATE_RESULTS);
   setMarkers();
@@ -162,7 +164,10 @@ function showResults(events) {
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 36.0237614, lng: -107.7637304 },
-    zoom: 12
+    zoom: 12,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.LEFT_CENTER
+  }
   });
 }
 // Adds markers to the map.
@@ -170,7 +175,9 @@ function setMarkers() {
 
   let bounds = new google.maps.LatLngBounds();
   //re-use only 1 info window
-  let infowindow = new google.maps.InfoWindow();
+  let infowindow = new google.maps.InfoWindow( { 
+    maxWidth: '280'
+  });
 
   // Shapes define the clickable region of the icon. The type defines an HTML
   // <area> element 'poly' which traces out a polygon as a series of X,Y points.
@@ -224,7 +231,7 @@ function toggleState(stateIndex) {
       $('.lblSpotifyStatus').html('You are logged in to Spotify').prop('hidden', false);
       break;
     case 2:
-      $('.js-results').prop('hidden', false);
+      $('.js-results-parent').prop('hidden', false);
       $('#frmSearch').prop('hidden', true);
       $('.searchToggle').prop('hidden', true);
       $('#map').addClass('display');
@@ -232,7 +239,7 @@ function toggleState(stateIndex) {
       $('.header-overlay').prop('hidden',false);
       break;
     case 3: //return to search
-      $('.js-results').prop('hidden', true);
+      $('.js-results-parent').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
@@ -327,7 +334,11 @@ function handleBackfromSearch() {
 }
 function togglePlayerDisplay(show) {
   if (show) {
-    $('.embedPlayer').addClass("display").fadeIn("slow");
+    $('.embedPlayer').addClass("display").fadeIn("slow"); 
+
+    setTimeout(function () {$('.js-results-parent').animate({
+      scrollTop: 300
+  }, 1000); }),500;
   }
   else {
     $('.embedPlayer').fadeOut("fast");
@@ -348,7 +359,7 @@ function handleArtistClick() {
         .fail(function (result) {
           if (result.status !== 403 && result.status !== 404) { //already paused = 403
             alert('Sorry, but Spotify needs you to login again.');
-            //window.location.href = "/"; 
+            window.location.href = "/"; 
           }
         })
       })

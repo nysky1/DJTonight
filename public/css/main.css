@@ -18,6 +18,11 @@
 button {
     padding:10px;
     border-radius: 5px;
+    background: white;
+}
+.btnSubmit {
+    background: #DA5B59;
+    color:white;
 }
 .btnBack {
     background-color: #fff;
@@ -39,9 +44,13 @@ header,main {
 header {
     padding:10px 0 0 0;
 }
+header h1 {
+    color:#DA5B59;
+    text-shadow: 1px 1px #555, 2px 2px 3px #555;
+}
 main h3 {
     margin:0;
-    padding:0 0 8px 0;
+    padding:0 5px 8px 5px;
 }
 main h4 {
     margin:0;
@@ -55,19 +64,45 @@ main {
     width:100%;
     height: 100%;
 }
-body {    
-    background:url('../images/bg.jpg') center center;
-    box-shadow: 0 0 300px 300px white inset;
-}
+body::after {
+    content: "";
+    background: url('../images/bg.jpg');
+    background-position: -100px -180px;
+    opacity: 0.4;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;   
+  }
 body.noBox {
     box-shadow: 0 0 0 0;
 }
+fieldset {
+    margin:0 auto;
+    border: none;
+}
+legend {
+    padding-top:15px;   
+    text-shadow: 1px 1px #555, 2px 2px 3px #555;
+}
+fieldset #city {
+    margin:10px
+}
+fieldset input {
+    border: solid 1px #000;
+    height:25px;
+    padding:5px;
+}
+
 .header-overlay {
     margin:10px auto;
     position:fixed;
-    top:0;
-    width: 100%;
-    left: 15%; /*split the 30% width*/
+    top:5%;
+    width: 20%;
+    left:55%;
+    /* left: 15%; split the 30% width */
     z-index: 1000;
     text-align: center;
 }
@@ -75,7 +110,8 @@ body.noBox {
     color: #DA5B59;
     text-shadow: 1px 1px #555, 2px 2px 3px #555;
 }
-.js-results {
+
+.js-results-parent {
     width:30%;
     /* background: #E0DFD5; */
     background: #000;
@@ -86,6 +122,11 @@ body.noBox {
     z-index:20;
     padding:10px;
     text-align: left;
+}
+.js-results {
+    padding:0;
+    margin:0;
+    list-style-type: none;
 }
 .js-panel-list-wrapper {
     display: block;
@@ -102,7 +143,7 @@ body.noBox {
 }
 .headerEvents {
     padding:10px 5px 5px 5px;
-    font-size:24px;
+    font-size:18px;
     color: #DA5B59;
 }
 .headerEventsSubtitle {
@@ -110,7 +151,10 @@ body.noBox {
 }
 .eventName{
     font-weight: bold;
+    font-size: 16px;
+    padding: 0;
     padding-left:30px;
+
 }
 
 .fa-spotify {
@@ -132,4 +176,44 @@ body.noBox {
     width: 100%;
     text-align: center;
     font-size: 13px;
+}
+/* Desktop */
+@media only screen and (min-width: 640px) {
+    body {
+        box-shadow: 0 0 300px 300px white inset;
+        /* background-size: 50%;
+        background-position: -40% 100px; */
+    }
+}
+
+/*iPhone 6/7/8 and Samsung S5 */
+@media only screen and (max-width: 640px) {
+    button {
+        padding:8px;
+    }
+    .header-overlay {
+        width:60%;
+        left:22%;
+        top:5%;
+        display:none;
+    }
+
+    #map.display {
+        height: 100%;
+        width:auto;
+        position:relative;
+        margin-left:0;
+    }
+    .js-results-parent {
+        width:100%;
+        position:fixed;
+        height:35%;
+        bottom:0;
+        left:0;
+    }
+    .js-results .btnBack {
+        float:right;
+        font-size: 10px;
+        margin-top: 5px;
+    }
 }
