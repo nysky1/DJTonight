@@ -180,7 +180,7 @@ function showResults(events) {
   let sArray = sortEventArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
 
-  $('.js-results').html('<li class="liBack"><button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button></li><li><div class="headerEvents">Tonight&#39;s Hottest Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div></li>').append(resultsHTML).append('<div class="spacer"></div><iframe class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
+  $('.js-results').html('<li class="liBack"><button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button></li><li><div class="headerEvents">Tonight&#39;s Hottest Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div></li>').append(resultsHTML).append('<div class="spacer"></div><iframe title="Spotify Playlist" class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
 
   toggleFormState(STATE_RESULTS);
   setMarkers();
@@ -191,7 +191,7 @@ function toggleFormState(stateIndex) {
       $('#frmSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       $('.lblSpotifyRequired').prop('hidden', true);
-      $('.lblSpotifyStatus').html('You are logged in to Spotify').prop('hidden', false);
+      $('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false);
       break;
     case 2:
       $('.js-results-parent').prop('hidden', false);
@@ -386,6 +386,7 @@ function setMarkers() {
     });
     google.maps.event.addListener(marker, 'click', (function (marker, i) {
       return function () {
+        map.setCenter(marker.getPosition());
         infowindow.setContent(`<h3>${eventsForMap[i].name}</h3><h4>${formatDateTime(eventsForMap[i].eventDate)}</h4>`);
         infowindow.open(map, marker);
       }

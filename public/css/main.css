@@ -68,7 +68,7 @@ body::after {
     content: "";
     background: url('../images/bg.jpg');
     background-position: -100px -180px;
-    opacity: 0.4;
+    opacity: 0.3;
     top: 0;
     left: 0;
     bottom: 0;
@@ -85,7 +85,7 @@ fieldset {
 }
 legend {
     padding-top:15px;   
-    text-shadow: 1px 1px #555, 2px 2px 3px #555;
+    text-shadow: 1px 1px #555, 2px 2px 3px #fff;
 }
 fieldset #city {
     margin:10px
@@ -177,12 +177,32 @@ fieldset input {
     text-align: center;
     font-size: 13px;
 }
-/* Desktop */
-@media only screen and (min-width: 640px) {
-    body {
-        box-shadow: 0 0 300px 300px white inset;
-        /* background-size: 50%;
-        background-position: -40% 100px; */
+/* DESKTOP */
+@media only screen and (min-width: 768px) {
+    header {
+        margin-top:30px
+    }
+}
+/* ipad portrait */
+@media only screen and (max-width: 768px) and ( orientation: portrait) { 
+    header {
+        margin-top: 50px;
+    }
+    body:after {
+        background-position: center center; 
+    }
+}
+/* ipad landscape */
+@media only screen and (max-height: 768px) and ( orientation: landscape) { 
+    header {
+        margin-top: 30px;
+    }
+    body:after {
+        background-position: center center; 
+    }
+    .header-overlay {
+        top:0;
+        width:25%;
     }
 }
 
@@ -215,5 +235,30 @@ fieldset input {
         float:right;
         font-size: 10px;
         margin-top: 5px;
+    }
+}
+
+@media only screen and (max-width: 667px) and (orientation: landscape) {
+    .headerEventsSubtitle {
+        font-size: 14px;    
+    }
+    .eventName {
+        font-size:14px;
+    }
+    .btnBack {
+        font-size:12px;
+    }
+}
+/*iPhone 5 and smaller format devices*/
+@media only screen and (max-width: 568px) and ( orientation: portrait) {
+    header {
+        margin-top: 20px;
+    }
+}
+
+/*phone landscape*/
+@media only screen and (max-height: 420px) and ( orientation: landscape) {
+    header {
+        margin-top: 10px;
     }
 }
