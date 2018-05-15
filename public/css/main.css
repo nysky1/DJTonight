@@ -95,7 +95,6 @@ fieldset input {
     height:25px;
     padding:5px;
 }
-
 .header-overlay {
     margin:10px auto;
     position:fixed;
@@ -110,7 +109,6 @@ fieldset input {
     color: #DA5B59;
     text-shadow: 1px 1px #555, 2px 2px 3px #555;
 }
-
 .js-results-parent {
     width:30%;
     /* background: #E0DFD5; */
@@ -156,7 +154,6 @@ fieldset input {
     padding-left:30px;
 
 }
-
 .fa-spotify {
     color: #1DB954;
 }
@@ -205,7 +202,6 @@ fieldset input {
         width:25%;
     }
 }
-
 /*iPhone 6/7/8 and Samsung S5 */
 @media only screen and (max-width: 640px) {
     button {
@@ -237,7 +233,6 @@ fieldset input {
         margin-top: 5px;
     }
 }
-
 @media only screen and (max-width: 667px) and (orientation: landscape) {
     .headerEventsSubtitle {
         font-size: 14px;    
@@ -255,7 +250,6 @@ fieldset input {
         margin-top: 20px;
     }
 }
-
 /*phone landscape*/
 @media only screen and (max-height: 420px) and ( orientation: landscape) {
     header {
