@@ -16,3 +16,5 @@ node_modules/
 # App related things
 .env
 .npmrc
+
+spotify.ejs
