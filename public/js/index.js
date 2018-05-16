@@ -1,7 +1,7 @@
 'use strict';
 const SONGKICK_API_KEY = 'YNtS7YGARCxD6b3X';
-const SONGKICK_API_LOCATION_URL = 'http://api.songkick.com/api/3.0/search/locations.json'; //http://api.songkick.com/api/3.0/search/locations.json?query=Denver,CO&apikey=ABC
-const SONGKICK_API_CALENDAR_URL = 'http://api.songkick.com/api/3.0/metro_areas/~METRO_ID~/calendar.json'; //http://api.songkick.com/api/3.0/metro_areas/6404/calendar.json?apikey=ABC
+const SONGKICK_API_LOCATION_URL = 'https://api.songkick.com/api/3.0/search/locations.json'; //http://api.songkick.com/api/3.0/search/locations.json?query=Denver,CO&apikey=ABC
+const SONGKICK_API_CALENDAR_URL = 'https://api.songkick.com/api/3.0/metro_areas/~METRO_ID~/calendar.json'; //http://api.songkick.com/api/3.0/metro_areas/6404/calendar.json?apikey=ABC
 
 const SPOTIFY_API_SEARCH_URL = 'https://api.spotify.com/v1/search';
 const SPOTIFY_API_TOP_TRACKS_URL = 'https://api.spotify.com/v1/artists/~ARTIST_ID~/top-tracks';
