@@ -251,7 +251,7 @@ function displayPlayer(results) {
     return deferred.resolve();
   }
   catch (e) {
-    return deferred.reject({ statusText: e.stack });
+    return deferred.reject({ statusText: `Oops, we're having trouble finding a playlist for this artist.` });
   }
 }
 function togglePlayerDisplay(show) {
