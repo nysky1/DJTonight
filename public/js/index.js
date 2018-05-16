@@ -193,11 +193,9 @@ function toggleFormState(stateIndex) {
   switch (stateIndex) {
     case 0:
       $('.js-results').addClass("no-spotify").removeClass("spotify");
-      //$('#frmSpotify').prop('hidden', true);
       $('#frmSkipSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       //$('.lblSpotifyRequired').prop('hidden', true);
-      //$('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false);
       break;
     case 1:
       $('.js-results').addClass("spotify").removeClass("no-spotify");
@@ -205,7 +203,7 @@ function toggleFormState(stateIndex) {
       $('#frmSearch').prop('hidden', false);
       $('#frmSkipSpotify').prop('hidden', true);
       $('.lblSpotifyRequired').prop('hidden', true);
-      $('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false);
+      $('.lblSpotifyStatus').html('You are logged into Spotify.').prop('hidden', false);
       break;
     case 2:
       $('.js-results-parent').prop('hidden', false);
@@ -213,7 +211,7 @@ function toggleFormState(stateIndex) {
       $('#frmSpotify').prop('hidden', true);
       $('#frmSkipSpotify').prop('hidden', true);
       $('.lblSpotifyRequired').prop('hidden', true);
-      $('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false)
+      $('.lblSpotifyStatus').html('You are logged into Spotify.').prop('hidden', false)
       $('.searchToggle').prop('hidden', true);
       $('#map').addClass('display');
       $('body').addClass('noBox full');
@@ -396,7 +394,7 @@ function setMarkers() {
   // <area> element 'poly' which traces out a polygon as a series of X,Y points.
   // The final coordinate closes the poly by connecting to the first coordinate.
   let shape = {
-    coords: [1, 1, 1, 20, 18, 20, 18, 1],
+    coords: [1, 1, 1, 40, 42, 40, 42, 1],
     type: 'poly'
   };
   for (var i = 0; i < eventsForMap.length; i++) {
