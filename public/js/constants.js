@@ -1,4 +1,4 @@
-const isDebug = false;
+const isDebug = true;
 const CONST_ACCESS_TOKEN_KEY = "access_token";
 const CONST_ACCESS_TOKEN_KEY_EXPIRATION = "access_token_expiration";
 
