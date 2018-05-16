@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,24 +12,23 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik" />
   <link rel="stylesheet" type="text/css" href="../css/grid.css" />
   <link rel="stylesheet" type="text/css" href="../css/main.css" />
-  
 </head>
 <body>
   <header role="banner" class="searchToggle">
     <h1>What's Hot Tonight?</h1>
-   </header>
+  </header>
   <main role="main">
     <h3 class="searchToggle">Discover the hottest music shows in your area tonight!</h3>
     <h4 class="lblSpotifyStatus searchToggle" hidden>You are now logged in to Spotify.</h4>
-  
     <h4 class="lblSpotifyRequired">A Spotify account is recommended.</h4>
     <form id="frmSpotify">
-      <button class="btnLoginSpotify"><i class="fa fa-spotify" aria-hidden="true"></i> Spotify Login</button>
+      <button class="btnLoginSpotify">
+        <i class="fa fa-spotify" aria-hidden="true"></i> Spotify Login</button>
     </form>
     <form id="frmSkipSpotify">
       <div class="orSpacer">or</div>
       <button class="btnSkipSpotify"> Continue without Spotify</button>
-    </form> 
+    </form>
     <form id="frmSearch" class="searchToggle" hidden>
       <fieldset>
         <legend>Enter your Location</legend>
@@ -38,7 +36,6 @@
         <input id="city" value="Denver" placeholder="Your City" />
         <label for="state"></label>
         <input id="state" value="CO" placeholder="Your State/Country" />
-       
       </fieldset>
       <button class="btnSubmit">Search</button>
     </form>
@@ -49,17 +46,13 @@
     <div class="js-results-parent" aria-live="assertive" hidden>
       <ul class="js-results"></ul>
     </div>
-
-    <div class="footer searchToggle">Credits: SongKick, Spotify, Google</div>    
-
+    <div class="footer searchToggle">Credits: SongKick, Spotify, Google</div>
   </main>
   <script type="text/javascript" src="js/constants.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJa2H-XH59JxiczNe0t6G6yZcRIqBMpN8&callback=initMap"
     defer async></script>
   <script type="text/javascript" src="js/index.js"></script>
   <script type="text/javascript" src="js/spotifyauth.js"></script>
-
 </body>
-
 </html>

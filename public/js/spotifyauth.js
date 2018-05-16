@@ -1,7 +1,6 @@
 'use strict';
 const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
 const SPOTIFY_AUTH_SCOPE = 'user-modify-playback-state'
-//const SPOTIFY_AUTH_STATE_KEY = 'spotify_auth_state' //for localstorage
 const SPOTIFY_CLIENT_ID = 'b43719f00c1248cda82e9ef99c537d9a'
 
 let SPOTIFY_AUTH_REDIRECT_URI = (isDebug) ? 'http://localhost:3000/callback' : 'https://whatshot2nite.azurewebsites.net/callback';
@@ -40,20 +39,18 @@ function checkToken() {
 function watchSpotifyLogin() {
     $('.btnLoginSpotify').click((event) => {
         event.preventDefault();
-        loginToSpotify();           
+        loginToSpotify();
     })
 }
 function watchSkipLogin() {
     $('.btnSkipSpotify').click((event) => {
         event.preventDefault();
-        toggleFormState(SKIP_LOGIN_CITY_SEARCH);        
+        toggleFormState(SKIP_LOGIN_CITY_SEARCH);
     })
 }
-
 function loadLoginSpotifyEventWatchers() {
     checkToken();
     watchSpotifyLogin();
     watchSkipLogin();
 }
-
 $(loadLoginSpotifyEventWatchers());

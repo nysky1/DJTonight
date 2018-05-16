@@ -9,8 +9,7 @@ const SPOTIFY_API_PAUSE = 'https://api.spotify.com/v1/me/player/pause';
 
 const MAPS_API_KEY = 'AIzaSyCJa2H-XH59JxiczNe0t6G6yZcRIqBMpN8'
 
-const MAX_EVENTS = 5;
-
+const MAX_EVENTS = 5; //number of events to display
 const eventsForMap = [];
 
 let map;
@@ -21,7 +20,7 @@ function prepareSongKickAPIURL(metroId) {
 function prepareSpotifyTopTracksAPIURL(artistId) {
   return SPOTIFY_API_TOP_TRACKS_URL.replace('~ARTIST_ID~', artistId);
 }
-/* BEGIN - SHOWS Object and Helper Methods */
+/* BEGIN - Music Performances Object and Helper Methods */
 function eventMaker(name, artist, venue, eventDate, city, lat, lng, popularity) {
   let thisEvent = {
     name: name,
@@ -49,6 +48,7 @@ function sortEventArrayByPopularity() {
   })
 }
 /* END - SHOWS Object and Helper Methods */
+
 /* BEGIN - SONGKICK METHODS */
 function getSongKickLocation() {
   dWrite('Calling SongKick API Location');
@@ -121,18 +121,18 @@ function getSpotifyTopTracks(artistList) {
   })
 }
 function handleSpotifySearch(artist) {
-  return $.when( 
+  return $.when(
     getSpotifyArtistId(artist))
     .done(function (results) {
-      $.when (        
+      $.when(
         displayPlayer(results)
-         .done(function (results) {
-           dWrite('Returned with Top Tracks');
-         })
-         .fail(function (result) {
-           alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
-           dWrite(result.statusText);
-        })
+          .done(function (results) {
+            dWrite('Returned with Top Tracks');
+          })
+          .fail(function (result) {
+            alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
+            dWrite(result.statusText);
+          })
       )
     })
     .fail(function (result) {
@@ -177,7 +177,7 @@ function showResults(events) {
   //build the event results HTML (refactor)
   for (let i = 0; i < eventsForMap.length; i++) {
     resultsHTML += `<li class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'>
-    <h3 class='eventName'>${(i+1)}. ${eventsForMap[i].name}</div>
+    <h3 class='eventName'>${(i + 1)}. ${eventsForMap[i].name}</div>
     <div></li>`;
   }
   let sArray = sortEventArrayByPopularity();
@@ -189,7 +189,7 @@ function showResults(events) {
   setMarkers();
 }
 function toggleFormState(stateIndex) {
-  dWrite('Toggling to Status:' + stateIndex );
+  dWrite('Toggling to Status:' + stateIndex);
   switch (stateIndex) {
     case 0:
       $('.js-results').addClass("no-spotify").removeClass("spotify");
@@ -203,7 +203,7 @@ function toggleFormState(stateIndex) {
       $('.js-results').addClass("spotify").removeClass("no-spotify");
       $('#frmSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
-      $('#frmSkipSpotify').prop('hidden', true);      
+      $('#frmSkipSpotify').prop('hidden', true);
       $('.lblSpotifyRequired').prop('hidden', true);
       $('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false);
       break;
@@ -217,7 +217,7 @@ function toggleFormState(stateIndex) {
       $('.searchToggle').prop('hidden', true);
       $('#map').addClass('display');
       $('body').addClass('noBox full');
-      $('.header-overlay').prop('hidden',false);
+      $('.header-overlay').prop('hidden', false);
       break;
     case 3: //return to search
       $('.js-results-parent').prop('hidden', true);
@@ -225,9 +225,9 @@ function toggleFormState(stateIndex) {
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
       $('body').removeClass('noBox full');
-      $('.header-overlay').prop('hidden',true);
+      $('.header-overlay').prop('hidden', true);
       break;
-     case 4: //return to search (without Login)
+    case 4: //return to search (without Login)
       $('.js-results-parent').prop('hidden', true);
       $('.lblSpotifyStatus').html('').prop('hidden', true)
       $('.lblSpotifyRequired').prop('hidden', false);
@@ -236,7 +236,7 @@ function toggleFormState(stateIndex) {
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
       $('body').removeClass('noBox full');
-      $('.header-overlay').prop('hidden',true);
+      $('.header-overlay').prop('hidden', true);
   }
 }
 function displayPlayer(results) {
@@ -246,21 +246,23 @@ function displayPlayer(results) {
   try {
     artistIdURI = results.artists.items[0].uri;
     embedURI = `https://open.spotify.com/embed?uri=${artistIdURI}`;
-    $('.embedPlayer').attr("src",embedURI);
+    $('.embedPlayer').attr("src", embedURI);
     togglePlayerDisplay(true);
     return deferred.resolve();
   }
   catch (e) {
-    return deferred.reject( {statusText: e.stack });
-  }  
+    return deferred.reject({ statusText: e.stack });
+  }
 }
 function togglePlayerDisplay(show) {
   if (show) {
-    $('.embedPlayer').addClass("display").fadeIn("slow"); 
+    $('.embedPlayer').addClass("display").fadeIn("slow");
 
-    setTimeout(function () {$('.js-results-parent').animate({
-      scrollTop: 300
-  }, 1000); }),500;
+    setTimeout(function () {
+      $('.js-results-parent').animate({
+        scrollTop: 300
+      }, 1000);
+    }), 500;
   }
   else {
     $('.embedPlayer').fadeOut("fast");
@@ -274,39 +276,39 @@ function validateLocationSetAndContinue(results) {
   }
   metroId = results.resultsPage.results.location["0"].metroArea.id;
   return defer.resolve(metroId);
-} 
+}
 /* END - UI DISPLAY METHODS */
 
 /* BEGIN - Main Events Functions */
 function handleArtistClick() {
   let artist;
-  if (!isUsingSpotify()) {return false;}
+  if (!isUsingSpotify()) { return false; }
 
   $('.js-results').on('click', '.js-panel-list-wrapper', function (event) {
     togglePlayerDisplay(false);
     artist = $(event.currentTarget).attr('aria-artist');
-    $.when (
+    $.when(
       handleSpotifySearch(artist))
-      .done(function() {
+      .done(function () {
         $.when(pausePlayback())
-        .done(function () {
-          dWrite("Paused");
-        })
-        .fail(function (result) {
-          if (result.status !== 403 && result.status !== 404) { //already paused = 403
-            alert('Sorry, but Spotify needs you to login again.');
-            window.location.href = "/"; 
-          }
-        })
+          .done(function () {
+            dWrite("Paused");
+          })
+          .fail(function (result) {
+            if (result.status !== 403 && result.status !== 404) { //already paused = 403
+              alert('Sorry, but Spotify needs you to login again.');
+              window.location.href = "/";
+            }
+          })
       })
-      .fail(function(error) {
-       alert(error);
+      .fail(function (error) {
+        alert(error);
       })
-}); //end click
+  }); //end click
 } //end function
 function handleBackfromSearch() {
   $('.js-results').on('click', '.btnBack', function (event) {
-    toggleFormState( (isUsingSpotify()) ? STATE_BACK_TO_SEARCH : SKIP_LOGIN_STATE_BACK_TO_SEARCH);
+    toggleFormState((isUsingSpotify()) ? STATE_BACK_TO_SEARCH : SKIP_LOGIN_STATE_BACK_TO_SEARCH);
     pausePlayback();
   })
 }
@@ -346,18 +348,18 @@ function handleSearchForLocationAndEvents() {
   });
 }
 function handleSpotifySearch(artist) {
-  return $.when( 
+  return $.when(
     getSpotifyArtistId(artist))
     .done(function (results) {
-      $.when (        
+      $.when(
         displayPlayer(results)
-         .done(function (results) {
-           dWrite('Returned with Top Tracks');
-         })
-         .fail(function (result) {
-           alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
-           dWrite(result.statusText);
-        })
+          .done(function (results) {
+            dWrite('Returned with Top Tracks');
+          })
+          .fail(function (result) {
+            alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
+            dWrite(result.statusText);
+          })
       )
     })
     .fail(function (result) {
@@ -378,7 +380,7 @@ function initMap() {
     zoom: 12,
     zoomControlOptions: {
       position: google.maps.ControlPosition.LEFT_CENTER
-  }
+    }
   });
 }
 // Adds markers to the map.
@@ -386,7 +388,7 @@ function setMarkers() {
 
   let bounds = new google.maps.LatLngBounds();
   //re-use only 1 info window
-  let infowindow = new google.maps.InfoWindow( { 
+  let infowindow = new google.maps.InfoWindow({
     maxWidth: '280'
   });
 
