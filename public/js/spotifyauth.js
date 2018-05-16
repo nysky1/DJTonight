@@ -37,16 +37,23 @@ function checkToken() {
     }
 }
 
-function watchLogin() {
+function watchSpotifyLogin() {
     $('.btnLoginSpotify').click((event) => {
         event.preventDefault();
         loginToSpotify();           
     })
 }
+function watchSkipLogin() {
+    $('.btnSkipSpotify').click((event) => {
+        event.preventDefault();
+        toggleFormState(SKIP_LOGIN_CITY_SEARCH);        
+    })
+}
 
 function loadLoginSpotifyEventWatchers() {
     checkToken();
-    watchLogin();
+    watchSpotifyLogin();
+    watchSkipLogin();
 }
 
 $(loadLoginSpotifyEventWatchers());

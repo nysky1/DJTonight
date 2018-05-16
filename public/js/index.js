@@ -85,6 +85,9 @@ function getSongKickEvents(metroId) {
 /* END - SONGKICK METHODS */
 
 /* BEGIN - SPOTIFY METHODS */
+function isUsingSpotify() {
+  return localStorage[CONST_ACCESS_TOKEN_KEY] !== undefined;
+}
 function getSpotifyArtistId(aristName) {
   dWrite('Calling SPOTIFY API - Get Artist Id');
 
@@ -186,19 +189,34 @@ function showResults(events) {
   setMarkers();
 }
 function toggleFormState(stateIndex) {
+  dWrite('Toggling to Status:' + stateIndex );
   switch (stateIndex) {
+    case 0:
+      $('.js-results').addClass("no-spotify").removeClass("spotify");
+      //$('#frmSpotify').prop('hidden', true);
+      $('#frmSkipSpotify').prop('hidden', true);
+      $('#frmSearch').prop('hidden', false);
+      //$('.lblSpotifyRequired').prop('hidden', true);
+      //$('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false);
+      break;
     case 1:
+      $('.js-results').addClass("spotify").removeClass("no-spotify");
       $('#frmSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
+      $('#frmSkipSpotify').prop('hidden', true);      
       $('.lblSpotifyRequired').prop('hidden', true);
       $('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false);
       break;
     case 2:
       $('.js-results-parent').prop('hidden', false);
       $('#frmSearch').prop('hidden', true);
+      $('#frmSpotify').prop('hidden', true);
+      $('#frmSkipSpotify').prop('hidden', true);
+      $('.lblSpotifyRequired').prop('hidden', true);
+      $('.lblSpotifyStatus').html('You are logged in to Spotify.').prop('hidden', false)
       $('.searchToggle').prop('hidden', true);
       $('#map').addClass('display');
-      $('body').addClass('noBox');
+      $('body').addClass('noBox full');
       $('.header-overlay').prop('hidden',false);
       break;
     case 3: //return to search
@@ -206,7 +224,18 @@ function toggleFormState(stateIndex) {
       $('#frmSearch').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
-      $('body').removeClass('noBox');
+      $('body').removeClass('noBox full');
+      $('.header-overlay').prop('hidden',true);
+      break;
+     case 4: //return to search (without Login)
+      $('.js-results-parent').prop('hidden', true);
+      $('.lblSpotifyStatus').html('').prop('hidden', true)
+      $('.lblSpotifyRequired').prop('hidden', false);
+      $('#frmSearch').prop('hidden', false);
+      $('#frmSpotify').prop('hidden', false);
+      $('.searchToggle').prop('hidden', false);
+      $('#map').removeClass('display');
+      $('body').removeClass('noBox full');
       $('.header-overlay').prop('hidden',true);
   }
 }
@@ -251,6 +280,8 @@ function validateLocationSetAndContinue(results) {
 /* BEGIN - Main Events Functions */
 function handleArtistClick() {
   let artist;
+  if (!isUsingSpotify()) {return false;}
+
   $('.js-results').on('click', '.js-panel-list-wrapper', function (event) {
     togglePlayerDisplay(false);
     artist = $(event.currentTarget).attr('aria-artist');
@@ -275,7 +306,7 @@ function handleArtistClick() {
 } //end function
 function handleBackfromSearch() {
   $('.js-results').on('click', '.btnBack', function (event) {
-    toggleFormState(STATE_BACK_TO_SEARCH);
+    toggleFormState( (isUsingSpotify()) ? STATE_BACK_TO_SEARCH : SKIP_LOGIN_STATE_BACK_TO_SEARCH);
     pausePlayback();
   })
 }
