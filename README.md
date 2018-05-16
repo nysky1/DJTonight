@@ -7,4 +7,6 @@ A Spotify login is recommended so that when you choose an event, we can show a S
 <h3>LIVE SITE</h3>
 <a target="_new" href="https://whatshot2nite.azurewebsites.net/">Go to the Live Site</a>
 
-<img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen1.jpg" />
+<img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen1.png" />
+
+<img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen2.png" />
