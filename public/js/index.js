@@ -449,13 +449,9 @@ function formatISODate(dt) {
   return dt.getUTCFullYear() + '-' + pad(dt.getUTCMonth() + 1) + '-' + pad(dt.getUTCDate());
 }
 function formatDateTime(dt) {
-  let date = new Date(dt);
-  var options = {
-    weekday: "long", year: "numeric", month: "short",
-    day: "numeric", hour: "2-digit", minute: "2-digit"
-  };
-  return date.toLocaleTimeString("en-us", options);
+  return moment(dt).format("MMM D, YYYY h:mm A");
 }
+
 /* UTILITIES */
 
 /* END VALIDATION */
