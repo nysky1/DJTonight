@@ -162,7 +162,7 @@ function showResults(events) {
   let eventLengthMax;
   
 
-  if (events.resultsPage.totalEntries !== 0) { writeError(1,'Sorry, there are no events tonight in that area.'); return false; }
+  if (events.resultsPage.totalEntries === 0) { writeError(1,'Sorry, there are no events tonight in that area.'); return false; }
   //sort the response, desc by popularity
   arySortedByPopularity = events.resultsPage.results.event.sort((a, b) => {
     return b.popularity - a.popularity;
@@ -294,13 +294,13 @@ function handleArtistClick() {
           })
           .fail(function (result) {
             if (result.status !== 403 && result.status !== 404) { //already paused = 403
-              alert('Sorry, but Spotify needs you to login again.');
-              window.location.href = "/";
+              writeError(2,'Sorry, but Spotify needs you to login again.');
+              setTimeout(function () {window.location.href = "/";},1500);
             }
           })
       })
       .fail(function (error) {
-        alert(error);
+        writeError(2,error);
       })
   }); //end click
 } //end function
