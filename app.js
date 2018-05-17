@@ -40,6 +40,6 @@ app.get('/spotify', (req, res) => {
   );
 });
 
-app.listen(port, () => {
+app.listen(port,'0.0.0.0', () => {
   debug(`listening on port ${chalk.green(port)}`);
 });

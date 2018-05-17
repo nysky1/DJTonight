@@ -1,4 +1,4 @@
-const isDebug = (location.hostname.toLowerCase().indexOf('localhost')>-1) ? false : true;
+const isDebug = (location.hostname.toLowerCase().indexOf('localhost') === -1 && location.hostname.toLowerCase().indexOf('dev.whatshot') === -1) ? false : true;
 const CONST_ACCESS_TOKEN_KEY = "access_token";
 const CONST_ACCESS_TOKEN_KEY_EXPIRATION = "access_token_expiration";
 
