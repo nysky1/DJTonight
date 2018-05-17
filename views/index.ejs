@@ -22,34 +22,31 @@
     <h4 class="lblSpotifyStatus searchToggle" hidden>You are now logged into Spotify.</h4>
     <h4 class="lblSpotifyRequired">A Spotify account is recommended.</h4>
     <form id="frmSpotify" role="form" >
-      <button class="btnLoginSpotify">
+      <button class="btnLoginSpotify" name="Spotify-Login">
         <i class="fa fa-spotify" aria-hidden="true"></i> Spotify Login
       </button>
     </form>
-    <form id="frmSkipSpotify" role="form">
+    <form id="frmSkipSpotify" role="form" name="Skip-Spotify">
       <div class="orSpacer">or</div>
       <button class="btnSkipSpotify">Continue without Spotify</button>
     </form>
     <form id="frmSearch" class="searchToggle" hidden>
       <fieldset>
         <legend>Enter your Location</legend>
+        <h5 class="errorDesc searchToggle" hidden></h5>
         <label for="city"></label>
-        <input id="city" value="" placeholder="Your City" />
+        <input id="city" value="DENVER" placeholder="Your City"  aria-label="Enter your City" />
         <label for="state"></label>
-        <input id="state" value="" placeholder="Your State/Country" />
+        <input id="state" value="CO" placeholder="Your State/Country" aria-label="Enter your State" />
       </fieldset>
       <button class="btnSubmit">Search</button>
-    </form>
-    <div class="header-overlay" hidden>
-      <h1>Hot Events</h1>
-    </div>
+    </form>    
     <div id="map"></div>
     <div class="js-results-parent" aria-live="assertive" hidden>
       <ul class="js-results"></ul>
-    </div>
-    <div class="footer searchToggle">Credits: SongKick, Spotify, Google</div>
+    </div>    
   </main>
-
+  <footer class="footer searchToggle">Credits: SongKick, Spotify, Google</footer>
   <script type="text/javascript" src="js/constants.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript" src="js/index.js"></script>

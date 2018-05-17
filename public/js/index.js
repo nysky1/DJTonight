@@ -102,7 +102,7 @@ function getSpotifyArtistId(aristName) {
     data: request,
     type: 'GET',
     beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); },
-    error: function (xhr, textStatus, errorThrown) { alert(errorThrown); }
+    error: function (xhr, textStatus, errorThrown) { return (errorThrown); }
   })
 }
 function getSpotifyTopTracks(artistList) {
@@ -117,7 +117,7 @@ function getSpotifyTopTracks(artistList) {
     type: 'GET',
     dataType: 'json',
     beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage[CONST_ACCESS_TOKEN_KEY]); },
-    error: function (xhr, textStatus, errorThrown) { alert(errorThrown); }
+    error: function (xhr, textStatus, errorThrown) { return (errorThrown); }
   })
 }
 function handleSpotifySearch(artist) {
@@ -130,13 +130,13 @@ function handleSpotifySearch(artist) {
             dWrite('Returned with Top Tracks');
           })
           .fail(function (result) {
-            alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
+            writeError(1,`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
             dWrite(result.statusText);
           })
       )
     })
     .fail(function (result) {
-      alert(`Oops, the Spotify API Artist Lookup failed - ${result.statusText}!`);
+      writeError(2,`Oops, the Spotify API Artist Lookup failed - ${result.statusText}!`);
       dWrite(result.statusText);
     })
 };
@@ -155,10 +155,14 @@ function pausePlayback() {
 /* BEBIN - UI DISPLAY METHODS */
 function showResults(events) {
   let resultsHTML = '';
+  let subHeaderHTML = '<li><div class="headerEvents">Tonight&#39;s Hot Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div></li>';
+  let backButtonHTML = '<li class="liBack"><button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button></li>';
+  let errorHTML = '<li class="liError" hidden aria-live="assertive"></li>'
   let arySortedByPopularity = [];
   let eventLengthMax;
+  
 
-  if (events.resultsPage.totalEntries === 0) { alert('Sorry, there are no events tonight in that area.'); return false; }
+  if (events.resultsPage.totalEntries !== 0) { writeError(1,'Sorry, there are no events tonight in that area.'); return false; }
   //sort the response, desc by popularity
   arySortedByPopularity = events.resultsPage.results.event.sort((a, b) => {
     return b.popularity - a.popularity;
@@ -182,8 +186,7 @@ function showResults(events) {
   }
   let sArray = sortEventArrayByPopularity();
   updateEventWithMostPopular(sArray[0]);
-
-  $('.js-results').html('<li class="liBack"><button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button></li><li><div class="headerEvents">Tonight&#39;s Hottest Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div></li>').append(resultsHTML).append('<div class="spacer"></div><iframe title="Spotify Playlist" class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
+  $('.js-results').html(backButtonHTML + subHeaderHTML + errorHTML ).append(resultsHTML).append('<div class="spacer"></div><iframe title="Spotify Playlist" class="embedPlayer" src="" width="0" height="0" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>');
 
   toggleFormState(STATE_RESULTS);
   setMarkers();
@@ -195,7 +198,6 @@ function toggleFormState(stateIndex) {
       $('.js-results').addClass("no-spotify").removeClass("spotify");
       $('#frmSkipSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
-      //$('.lblSpotifyRequired').prop('hidden', true);
       break;
     case 1:
       $('.js-results').addClass("spotify").removeClass("no-spotify");
@@ -213,17 +215,16 @@ function toggleFormState(stateIndex) {
       $('.lblSpotifyRequired').prop('hidden', true);
       $('.lblSpotifyStatus').html('You are logged into Spotify.').prop('hidden', false)
       $('.searchToggle').prop('hidden', true);
+      $('.errorDesc').prop('hidden', true).html('');
       $('#map').addClass('display');
       $('body').addClass('noBox full');
-      $('.header-overlay').prop('hidden', false);
       break;
     case 3: //return to search
       $('.js-results-parent').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
-      $('body').removeClass('noBox full');
-      $('.header-overlay').prop('hidden', true);
+      $('body').removeClass('noBox full');      
       break;
     case 4: //return to search (without Login)
       $('.js-results-parent').prop('hidden', true);
@@ -233,8 +234,8 @@ function toggleFormState(stateIndex) {
       $('#frmSpotify').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
-      $('body').removeClass('noBox full');
-      $('.header-overlay').prop('hidden', true);
+      $('body').removeClass('noBox full');      
+
   }
 }
 function displayPlayer(results) {
@@ -281,7 +282,6 @@ function validateLocationSetAndContinue(results) {
 function handleArtistClick() {
   let artist;
   if (!isUsingSpotify()) { return false; }
-
   $('.js-results').on('click', '.js-panel-list-wrapper', function (event) {
     togglePlayerDisplay(false);
     artist = $(event.currentTarget).attr('aria-artist');
@@ -306,7 +306,7 @@ function handleArtistClick() {
 } //end function
 function handleBackfromSearch() {
   $('.js-results').on('click', '.btnBack', function (event) {
-    toggleFormState((isUsingSpotify()) ? STATE_BACK_TO_SEARCH : SKIP_LOGIN_STATE_BACK_TO_SEARCH);
+    toggleFormState(checkToken() ? STATE_BACK_TO_SEARCH : SKIP_LOGIN_STATE_BACK_TO_SEARCH);
     pausePlayback();
   })
 }
@@ -314,6 +314,12 @@ function handleSearchForLocationAndEvents() {
   $('.btnSubmit').click((event) => {
     event.preventDefault();
     eventsForMap.length = 0;
+
+    //validate city/state client side
+    if ($('#city').val().length === 0 || $('#state').val().length === 0) {
+      writeError(1,"Oops, city and state are required");
+      return false;
+    } 
     //call API with promise
     $.when(
       getSongKickLocation()
@@ -333,16 +339,14 @@ function handleSearchForLocationAndEvents() {
             dWrite('Location is ok, continuing.');
           })
           .fail(function () {
-            alert(`Oops, we can't find that location.  Have another look at your location entry!`);
+            writeError(1,`Oops, we can't find that location.  Have another look at your location entry!`);
             dWrite('No Geo Results from Location API');
           })
       })
       .fail(function (result) {
-        alert(`Oops, the location search failed.  Check the API Key and URL - ${result.statusText} (${result.status})!`);
+        writeError(1,`Oops, the location search failed.  Check that you are online and the API Key and URL - ${result.statusText} (${result.status})!`);
         dWrite(result.statusText);
       });
-
-
   });
 }
 function handleSpotifySearch(artist) {
@@ -355,13 +359,13 @@ function handleSpotifySearch(artist) {
             dWrite('Returned with Top Tracks');
           })
           .fail(function (result) {
-            alert(`Oops, the Spotify API Top Tracks Lookup failed - ${result.statusText} (${result.status})!`);
+            writeError(2,`Oops, we cannot find a list of tracks for this artist!`);
             dWrite(result.statusText);
           })
       )
     })
     .fail(function (result) {
-      alert(`Oops, the Spotify API Artist Lookup failed - ${result.statusText}!`);
+      writeError(2,`Oops, the Spotify API Artist Lookup failed - ${result.statusText}!`);
       dWrite(result.statusText);
     })
 };
@@ -404,13 +408,12 @@ function setMarkers() {
       map: map,
 
       icon: {
-        url: '/images/blank-marker.png',
+        url: '/images/blank-marker2.png',
         labelOrigin: new google.maps.Point(18, 13)
       },
       shape: shape,
       label: {
-        text: "" + (i + 1),
-        fontWeight: 'bold'
+        text: "" + (i + 1)
       },
       title: eventsForMap[i].name,
       zIndex: 9999
@@ -427,6 +430,13 @@ function setMarkers() {
   map.fitBounds(bounds);
 }
 /* END MAP FUNCTIONS */
+
+/* ERROR LOGGER */
+function writeError(loc,message) {
+  let errorElement = (loc === 1) ? $('.errorDesc' ) : $('.liError');
+  errorElement.html(message).prop('hidden',false);
+}
+/* END ERROR LOGGER */
 
 /* UTILITIES */
 function formatISODate(dt) {

@@ -5,6 +5,7 @@
 A Spotify login is recommended so that when you choose an event, we can show a Spotify embedded music player allowing you to preview the selected HOT band.
 
 <h3>LIVE SITE</h3>
+<h5>Spotify Demo Account: spotifytestuser99@gmail.com - Spotify Demo Password: MuzicRules99</h5>
 <a target="_new" href="https://whatshot2nite.azurewebsites.net/">Go to the Live Site</a>
 
 <img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen1.png" />

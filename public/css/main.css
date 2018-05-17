@@ -49,8 +49,10 @@ header,main {
 }
 header {
     padding:10px 0 0 0;
+    margin:0 0 25px 0;
 }
 header h1 {
+    font-size: 40px;
     color:#DA5B59;
     text-shadow: 1px 1px #555, 2px 2px 3px #555;
 }
@@ -75,7 +77,7 @@ main {
 }
 body::after {
     content: "";
-    background: url('../images/bg.jpg');
+    background: url('../images/bg.jpg') #000;
     background-position: -100px -180px;
     opacity: 0.3;
     top: 0;
@@ -107,19 +109,10 @@ fieldset input {
     height:25px;
     padding:5px;
 }
-.header-overlay {
-    margin:10px auto;
-    position:fixed;
-    top:5%;
-    width: 20%;
-    left:55%;
-    /* left: 15%; split the 30% width */
-    z-index: 1000;
-    text-align: center;
-}
-.header-overlay h1 {
+.errorDesc,.liError {
+    margin: 5px 0;
     color: #DA5B59;
-    text-shadow: 1px 1px #555, 2px 2px 3px #555;
+    font-size:16px;
 }
 .js-results-parent {
     width:30%;
@@ -159,11 +152,12 @@ fieldset input {
 }
 .headerEvents {
     padding:10px 5px 5px 5px;
-    font-size:18px;
+    font-size:30px;
     color: #DA5B59;
+    text-transform: uppercase;
 }
 .headerEventsSubtitle {
-    padding:0px 30px 5px 5px;
+    padding:0px 30px 10px 5px;
 }
 .eventName{
     font-weight: bold;
@@ -200,6 +194,18 @@ fieldset input {
         margin-top:30px
     }
 }
+/* ipad pro portrait */
+@media only screen and (max-width: 1024px) and ( orientation: portrait) { 
+    header {
+        margin-top: 50px;
+    }
+    body:after {
+        background-position: center center; 
+    }
+    .headerEvents {
+        font-size: 24px;
+    }
+}
 /* ipad portrait */
 @media only screen and (max-width: 768px) and ( orientation: portrait) { 
     header {
@@ -207,6 +213,9 @@ fieldset input {
     }
     body:after {
         background-position: center center; 
+    }
+    .headerEvents {
+        font-size: 16px;
     }
 }
 /* ipad landscape */
@@ -217,10 +226,10 @@ fieldset input {
     body:after {
         background-position: center center; 
     }
-    .header-overlay {
-        top:0;
-        width:25%;
+    .headerEvents {
+        font-size: 24px;
     }
+
 }
 /*iPhone 6/7/8 and Samsung S5 */
 @media only screen and (max-width: 640px) {
@@ -252,6 +261,9 @@ fieldset input {
         font-size: 10px;
         margin-top: 5px;
     }
+    .headerEvents {
+        font-size: 26px;
+    }
 }
 @media only screen and (max-width: 667px) and (orientation: landscape) {
     .headerEventsSubtitle {
@@ -263,11 +275,17 @@ fieldset input {
     .btnBack {
         font-size:12px;
     }
+    .headerEvents {
+        font-size: 14px;
+    }
 }
 /*iPhone 5 and smaller format devices*/
 @media only screen and (max-width: 568px) and ( orientation: portrait) {
     header {
         margin-top: 20px;
+    }
+    .headerEvents {
+        font-size:18px;
     }
 }
 /*phone landscape*/

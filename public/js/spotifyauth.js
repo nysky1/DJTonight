@@ -33,7 +33,9 @@ function checkToken() {
     if (localStorage[CONST_ACCESS_TOKEN_KEY] !== undefined && expirDate > currDate) {
         toggleFormState(STATE_CITY_SEARCH);
         dWrite('Toggle State to next Form');
+        return true;
     }
+    return false;
 }
 
 function watchSpotifyLogin() {
