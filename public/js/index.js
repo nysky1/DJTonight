@@ -451,7 +451,6 @@ function formatISODate(dt) {
 function formatDateTime(dt) {
   return moment(dt).format("MMM D, YYYY h:mm A");
 }
-
 /* UTILITIES */
 
 /* END VALIDATION */
