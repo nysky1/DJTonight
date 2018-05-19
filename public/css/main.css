@@ -20,6 +20,9 @@ button {
     border-radius: 5px;
     background: white;
 }
+.text-input {
+	padding: 2px 10px;
+}
 .btnSubmit {
     background: #DA5B59;
     color:white;
