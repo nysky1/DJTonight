@@ -198,13 +198,14 @@ function toggleFormState(stateIndex) {
       $('.js-results').addClass("no-spotify").removeClass("spotify");
       $('#frmSkipSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
+      $('.frmWrapper').hide();
       break;
     case 1:
       $('.js-results').addClass("spotify").removeClass("no-spotify");
       $('#frmSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       $('#frmSkipSpotify').prop('hidden', true);
-      $('.lblSpotifyRequired').prop('hidden', true);
+      $('.frmWrapper').hide();
       $('.lblSpotifyStatus').html('You are logged into Spotify.').prop('hidden', false);
       break;
     case 2:
@@ -212,29 +213,28 @@ function toggleFormState(stateIndex) {
       $('#frmSearch').prop('hidden', true);
       $('#frmSpotify').prop('hidden', true);
       $('#frmSkipSpotify').prop('hidden', true);
-      $('.lblSpotifyRequired').prop('hidden', true);
+
       $('.lblSpotifyStatus').html('You are logged into Spotify.').prop('hidden', false)
       $('.searchToggle').prop('hidden', true);
       $('.errorDesc').prop('hidden', true).html('');
       $('#map').addClass('display');
-      $('body').addClass('noBox full');
+      $('body').addClass('full');
       break;
     case 3: //return to search
       $('.js-results-parent').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
-      $('body').removeClass('noBox full');      
+      $('body').removeClass('full');      
       break;
     case 4: //return to search (without Login)
       $('.js-results-parent').prop('hidden', true);
       $('.lblSpotifyStatus').html('').prop('hidden', true)
-      $('.lblSpotifyRequired').prop('hidden', false);
       $('#frmSearch').prop('hidden', false);
       $('#frmSpotify').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
-      $('body').removeClass('noBox full');      
+      $('body').removeClass('full');      
 
   }
 }

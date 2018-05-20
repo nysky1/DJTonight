@@ -1,4 +1,4 @@
-* { box-sizing:border-box; }
+ * { box-sizing:border-box; }
 
 #map {
     height: 0;
@@ -15,18 +15,7 @@
     margin-left:30%;
     z-index: 10;
 }
-button {
-    padding:10px;
-    border-radius: 5px;
-    background: white;
-}
-.text-input {
-	padding: 2px 10px;
-}
-.btnSubmit {
-    background: #DA5B59;
-    color:white;
-}
+
 .btnBack {
     background-color: #fff;
     color:#000;
@@ -55,17 +44,23 @@ header {
     margin:0 0 25px 0;
 }
 header h1 {
-    font-size: 40px;
+    font-size: 30px;
     color:#DA5B59;
-    text-shadow: 1px 1px #555, 2px 2px 3px #555;
+    /*text-shadow: 1px 1px #555, 2px 2px 3px #555;*/    
 }
 main h3 {
     margin:0;
     padding:0 5px 8px 5px;
+    
+}
+main h3.subTitle {
+    color:#000;
+    font-size:16px;
+    font-family: Roboto;
 }
 main h4 {
     margin:0;
-    padding:10px 0 5px 0;
+    padding:10px 0 15px 0;
 }
 main .orSpacer {
     padding:5px;
@@ -90,27 +85,69 @@ body::after {
     position: absolute;
     z-index: -1;   
   }
-body.noBox {
-    box-shadow: 0 0 0 0;
+.frmWrapper {
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 3px;
+    background: white;
+    margin: 0 auto;
+    margin-top:15px;
+    box-shadow: 0 1px 46px -4px rgba(0,0,0,.28)
+}
+
+#frmSearch {
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 3px;
+    background: white;
+    margin: 0 auto;
+    box-shadow: 0 1px 46px -4px rgba(0,0,0,.28)
 }
 fieldset {
     margin:0 auto;
     border: none;
+    text-align:center;
 }
 legend {
-    padding-top:15px;   
+    padding-bottom:5px;   
     text-align: center;
     margin:0 auto;
     width:100%;
-    text-shadow: 1px 1px #555, 2px 2px 3px #fff;
+    line-height: 38px;
+    font-size: 24px;
+    color:#999;
 }
 fieldset #city {
-    margin:10px
+    margin-bottom:10px
 }
-fieldset input {
-    border: solid 1px #000;
-    height:25px;
-    padding:5px;
+fieldset input,fieldset button,.frmWrapper button {
+    border: solid 1px #dcdcdc;
+    height:auto;
+    width:100%;
+    padding:15px;
+    display: block;
+    text-align: left;
+    margin: 0 auto;
+    border-radius: 3px;
+    background: #fcfcfc;
+    margin: 10px auto 10px ;
+    transition: opacity 0.4s;
+}
+.frmWrapper button {
+    text-align: center;
+    background: #DA5B59;
+    color: white;
+}
+.frmWrapper button:hover {
+    text-align: center;
+    background: #951916;
+    color: white;
+    cursor: pointer;
+}
+.btnSubmit {
+    background: #DA5B59;
+    color:white;
+    text-align: center;
 }
 .errorDesc,.liError {
     margin: 5px 0;
@@ -290,10 +327,14 @@ fieldset input {
     .headerEvents {
         font-size:18px;
     }
+    header h1 {
+        font-size:30px;
+    }
 }
 /*phone landscape*/
 @media only screen and (max-height: 420px) and ( orientation: landscape) {
     header {
         margin-top: 10px;
     }
+    
 }
