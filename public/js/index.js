@@ -142,7 +142,6 @@ function handleSpotifySearch(artist) {
 };
 function pausePlayback() {
   dWrite('Calling SPOTIFY API - Pause Playback');
-
   return $.ajax({
     url: SPOTIFY_API_PAUSE,
     type: 'PUT',
@@ -155,7 +154,7 @@ function pausePlayback() {
 /* BEBIN - UI DISPLAY METHODS */
 function showResults(events) {
   let resultsHTML = '';
-  let subHeaderHTML = '<li><div class="headerEvents">Hot Events in <a class="lnkBack" href="#" aria-label="Go Back" title="Change City">'  + cityName + '</a></div><div class="headerEventsSubtitle"><a class=" href="#" aria-label="Change your city"><i class="fa fa-chevron-left"></i> change city</a></div></li>';
+  let subHeaderHTML = '<li><div class="headerEvents">Hot Events in <a class="lnkBack" href="#" title="Change City">'  + cityName + '</a></div><div class="headerEventsSubtitle"><a href="#" aria-label="Change your city"><i class="fa fa-chevron-left"></i> change city</a></div></li>';
   let backButtonHTML = '';
   let errorHTML = '<li class="liError" hidden aria-live="assertive"></li>'
   let arySortedByPopularity = [];
@@ -180,7 +179,7 @@ function showResults(events) {
   }
   //build the event results HTML (refactor)
   for (let i = 0; i < eventsForMap.length; i++) {
-    resultsHTML += `<li class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'>
+    resultsHTML += `<li class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}' role="button" >
     <h3 class='eventName'>${(i + 1)}<span class="eventNameSpacer"></span>${eventsForMap[i].name}</div>
     <div></li>`;
   }
