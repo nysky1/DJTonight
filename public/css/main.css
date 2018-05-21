@@ -23,7 +23,7 @@ html {
 html,body {
     margin: 0px;
     padding: 0px;
-    font-family: 'rubik',arial,'sans-serif'; 
+    font-family: 'rubik','sans-serif'; 
 }
 body.full {
     height: 100%;
@@ -41,6 +41,7 @@ header h1 {
     font-size: 36px;
     color:#DA5B59;
     font-weight: 900 !important;
+    font-family: 'Crete Round',arial,'sans serif'
 }
 main h3 {
     margin:0;
