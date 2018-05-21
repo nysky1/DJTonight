@@ -8,6 +8,5 @@ A Spotify login is recommended so that when you choose an event, we can show a S
 <h5><b>Spotify Demo Account:</b> spotifytestuser99@gmail.com - <b>Spotify Demo Password:</b> MuzicRules99</h5>
 <a target="_new" href="https://whatshot2nite.azurewebsites.net/">Go to the Live Site</a> 
 
-<img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen1.png?v1" />
-
-<img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen2.png?v1" />
+<img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen1.png?v2" />
+<img alt="Whats Hot Tonight Screenshot" src="https://whatshot2nite.azurewebsites.net/images/screen2.png?v2" />

@@ -16,13 +16,7 @@
     z-index: 10;
 }
 
-.btnBack {
-    background-color: #fff;
-    color:#000;
-}
-
-/* Optional: Makes the sample page fill the window. */
-
+/* Makes the map fill the window. */
 html {
     height: 100%;
 }
@@ -76,7 +70,7 @@ main {
 body::after {
     content: "";
     background: url('../images/bg.jpg') #000;
-    background-position: -100px -180px;
+    background-size:cover;
     opacity: 0.3;
     top: 0;
     left: 0;
@@ -115,7 +109,7 @@ legend {
     width:100%;
     line-height: 38px;
     font-size: 24px;
-    color:#999;
+    color:#7F7E7E;
 }
 fieldset #city {
     margin-bottom:10px
@@ -138,11 +132,14 @@ fieldset input,fieldset button,.frmWrapper button {
     background: #DA5B59;
     color: white;
 }
-.frmWrapper button:hover {
+.frmWrapper button:hover,.btnSubmit:hover {
     text-align: center;
     background: #951916;
     color: white;
     cursor: pointer;
+}
+.lnkBack {
+    color:#DA5B59;
 }
 .btnSubmit {
     background: #DA5B59;
@@ -156,8 +153,7 @@ fieldset input,fieldset button,.frmWrapper button {
 }
 .js-results-parent {
     width:30%;
-    /* background: #E0DFD5; */
-    background: #000;
+    background: #181818;
     color:white;
     position: relative;
     height:100%;
@@ -175,9 +171,8 @@ fieldset input,fieldset button,.frmWrapper button {
     display: block;
     padding: 10px 5px;
     min-height: 50px;
-    background: url('../images/Spotify_Icon_RGB_Green.png') center left no-repeat;
-    background-position-x: 5px;
-    background-size: 25px;
+    border-bottom: solid 1px #282828;
+    
 }
 .js-results.no-spotify .js-panel-list-wrapper {
     display: block;
@@ -186,8 +181,11 @@ fieldset input,fieldset button,.frmWrapper button {
     background-image: url('../images/spacer.gif');
 }
 .js-results.spotify .js-panel-list-wrapper:hover {
-    background-color:#fff;
-    color:black;
+    background-color:#282828;
+    cursor: pointer;
+}
+.js-results.spotify .js-panel-list-wrapper:active,.js-results.spotify .js-panel-list-wrapper.highlight {
+    background-color:#DA5B59;
     cursor: pointer;
 }
 .headerEvents {
@@ -195,15 +193,29 @@ fieldset input,fieldset button,.frmWrapper button {
     font-size:30px;
     color: #DA5B59;
     text-transform: uppercase;
+    text-align: center;
+}
+.headerEvents a {
+    display:block;
 }
 .headerEventsSubtitle {
-    padding:0px 30px 10px 5px;
+    padding:0px 0px 10px 5px;
+    text-align: center;
+}
+.headerEventsSubtitle a {
+    color:white;
+    text-decoration: none;
+    cursor: pointer;
 }
 .eventName{
-    font-weight: bold;
-    font-size: 16px;
+    font-weight: normal;
+    font-size: 14px;
     padding: 0;
-    padding-left:30px;
+    line-height: 18px;
+    font-family: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.eventNameSpacer {
+    margin-right:15px;
 }
 .js-results.no-spotify .eventName {
     padding-left:0px;
@@ -239,9 +251,6 @@ fieldset input,fieldset button,.frmWrapper button {
     header {
         margin-top: 50px;
     }
-    body:after {
-        background-position: center center; 
-    }
     .headerEvents {
         font-size: 24px;
     }
@@ -251,9 +260,7 @@ fieldset input,fieldset button,.frmWrapper button {
     header {
         margin-top: 50px;
     }
-    body:after {
-        background-position: center center; 
-    }
+    
     .headerEvents {
         font-size: 16px;
     }
@@ -263,9 +270,7 @@ fieldset input,fieldset button,.frmWrapper button {
     header {
         margin-top: 30px;
     }
-    body:after {
-        background-position: center center; 
-    }
+    
     .headerEvents {
         font-size: 24px;
     }
@@ -296,11 +301,6 @@ fieldset input,fieldset button,.frmWrapper button {
         bottom:0;
         left:0;
     }
-    .js-results .btnBack {
-        float:right;
-        font-size: 10px;
-        margin-top: 5px;
-    }
     .headerEvents {
         font-size: 26px;
     }
@@ -311,9 +311,6 @@ fieldset input,fieldset button,.frmWrapper button {
     }
     .eventName {
         font-size:14px;
-    }
-    .btnBack {
-        font-size:12px;
     }
     .headerEvents {
         font-size: 14px;
@@ -326,6 +323,9 @@ fieldset input,fieldset button,.frmWrapper button {
     }
     .headerEvents {
         font-size:18px;
+    }
+    .headerEventsSubtitle {
+        font-size: 14px;    
     }
     header h1 {
         font-size:30px;

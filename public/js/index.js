@@ -12,7 +12,7 @@ const MAPS_API_KEY = 'AIzaSyCJa2H-XH59JxiczNe0t6G6yZcRIqBMpN8'
 const MAX_EVENTS = 5; //number of events to display
 const eventsForMap = [];
 
-let map;
+let map, cityName;
 
 function prepareSongKickAPIURL(metroId) {
   return SONGKICK_API_CALENDAR_URL.replace('~METRO_ID~', metroId);
@@ -155,8 +155,8 @@ function pausePlayback() {
 /* BEBIN - UI DISPLAY METHODS */
 function showResults(events) {
   let resultsHTML = '';
-  let subHeaderHTML = '<li><div class="headerEvents">Tonight&#39;s Hot Events</div><div class="headerEventsSubtitle">(ranked by Popularity)</div></li>';
-  let backButtonHTML = '<li class="liBack"><button class="btnBack"><i class="fa fa-chevron-left" aria-hidden="true"></i> Change City</button></li>';
+  let subHeaderHTML = '<li><div class="headerEvents">Hot Events in <a class="lnkBack" href="#" aria-label="Go Back" title="Change City">'  + cityName + '</a></div><div class="headerEventsSubtitle"><a class=" href="#" aria-label="Change your city"><i class="fa fa-chevron-left"></i> change city</a></div></li>';
+  let backButtonHTML = '';
   let errorHTML = '<li class="liError" hidden aria-live="assertive"></li>'
   let arySortedByPopularity = [];
   let eventLengthMax;
@@ -181,7 +181,7 @@ function showResults(events) {
   //build the event results HTML (refactor)
   for (let i = 0; i < eventsForMap.length; i++) {
     resultsHTML += `<li class='js-panel-list-wrapper' aria-artist='${eventsForMap[i].artist}'>
-    <h3 class='eventName'>${(i + 1)}. ${eventsForMap[i].name}</div>
+    <h3 class='eventName'>${(i + 1)}<span class="eventNameSpacer"></span>${eventsForMap[i].name}</div>
     <div></li>`;
   }
   let sArray = sortEventArrayByPopularity();
@@ -199,6 +199,8 @@ function toggleFormState(stateIndex) {
       $('#frmSkipSpotify').prop('hidden', true);
       $('#frmSearch').prop('hidden', false);
       $('.frmWrapper').hide();
+      $('#city').focus();
+      localStorage.removeItem(CONST_ACCESS_TOKEN_KEY);
       break;
     case 1:
       $('.js-results').addClass("spotify").removeClass("no-spotify");
@@ -225,7 +227,8 @@ function toggleFormState(stateIndex) {
       $('#frmSearch').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
-      $('body').removeClass('full');      
+      $('body').removeClass('full');  
+      setDisableForm(0);    
       break;
     case 4: //return to search (without Login)
       $('.js-results-parent').prop('hidden', true);
@@ -234,7 +237,8 @@ function toggleFormState(stateIndex) {
       $('#frmSpotify').prop('hidden', false);
       $('.searchToggle').prop('hidden', false);
       $('#map').removeClass('display');
-      $('body').removeClass('full');      
+      $('body').removeClass('full');     
+      setDisableForm(0); 
 
   }
 }
@@ -261,10 +265,11 @@ function togglePlayerDisplay(show) {
       $('.js-results-parent').animate({
         scrollTop: 300
       }, 1000);
-    }), 500;
+    }, 500);
   }
   else {
     $('.embedPlayer').fadeOut("fast");
+
   }
 }
 function validateLocationSetAndContinue(results) {
@@ -274,6 +279,7 @@ function validateLocationSetAndContinue(results) {
     return defer.reject();
   }
   metroId = results.resultsPage.results.location["0"].metroArea.id;
+  cityName = results.resultsPage.results.location["0"].metroArea.displayName;
   return defer.resolve(metroId);
 }
 /* END - UI DISPLAY METHODS */
@@ -281,10 +287,14 @@ function validateLocationSetAndContinue(results) {
 /* BEGIN - Main Events Functions */
 function handleArtistClick() {
   let artist;
-  if (!isUsingSpotify()) { return false; }
   $('.js-results').on('click', '.js-panel-list-wrapper', function (event) {
+    if (!isUsingSpotify()) { return false; }
     togglePlayerDisplay(false);
+    removeHiglightArtist();
+    $(this).toggleClass('highlight');
+
     artist = $(event.currentTarget).attr('aria-artist');
+    clearError();
     $.when(
       handleSpotifySearch(artist))
       .done(function () {
@@ -305,7 +315,11 @@ function handleArtistClick() {
   }); //end click
 } //end function
 function handleBackfromSearch() {
-  $('.js-results').on('click', '.btnBack', function (event) {
+  $('.js-results').on('click', '.headerEventsSubtitle a', function (event) {
+    toggleFormState(checkToken() ? STATE_BACK_TO_SEARCH : SKIP_LOGIN_STATE_BACK_TO_SEARCH);
+    pausePlayback();
+  })
+  $('.js-results').on('click', '.lnkBack', function (event) {
     toggleFormState(checkToken() ? STATE_BACK_TO_SEARCH : SKIP_LOGIN_STATE_BACK_TO_SEARCH);
     pausePlayback();
   })
@@ -314,7 +328,8 @@ function handleSearchForLocationAndEvents() {
   $('.btnSubmit').click((event) => {
     event.preventDefault();
     eventsForMap.length = 0;
-
+    setDisableForm(1);
+   
     //validate city/state client side
     if ($('#city').val().length === 0 || $('#state').val().length === 0) {
       writeError(1,"Oops, city and state are required");
@@ -360,6 +375,7 @@ function handleSpotifySearch(artist) {
           })
           .fail(function (result) {
             writeError(2,`Oops, we cannot find a list of tracks for this artist!`);
+            scrollUptoError();
             dWrite(result.statusText);
           })
       )
@@ -369,6 +385,14 @@ function handleSpotifySearch(artist) {
       dWrite(result.statusText);
     })
 };
+function removeHiglightArtist(event) {
+  $('.js-panel-list-wrapper').each(function (i, y) {
+    $(y).removeClass('highlight')
+  })
+}
+function setDisableForm(state) {
+  $('.btnSubmit').prop('disabled',(state) ? true : false);
+}
 /* END - Main Event Callback Functions */
 function loadEventWatchers() {
   handleSearchForLocationAndEvents();
@@ -431,12 +455,23 @@ function setMarkers() {
 }
 /* END MAP FUNCTIONS */
 
-/* ERROR LOGGER */
+/* ERROR LOGGER/CLEAR */
 function writeError(loc,message) {
   let errorElement = (loc === 1) ? $('.errorDesc' ) : $('.liError');
   errorElement.html(message).prop('hidden',false);
+  setDisableForm(0);
 }
-/* END ERROR LOGGER */
+function clearError() {
+  $('.liError').html('').prop('hidden',true); 
+}
+function scrollUptoError() {
+  setTimeout(function () {
+    $('.js-results-parent').animate({
+      scrollTop: 0
+    }, 1000);
+  },500);
+}
+/* END ERROR LOGGER/CLEAR */
 
 /* UTILITIES */
 function formatISODate(dt) {
