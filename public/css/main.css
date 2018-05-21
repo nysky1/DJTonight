@@ -23,7 +23,7 @@ html {
 html,body {
     margin: 0px;
     padding: 0px;
-    font-family: 'rubik','sans-serif'; 
+    font-family: 'rubik',arial,'sans-serif'; 
 }
 body.full {
     height: 100%;
